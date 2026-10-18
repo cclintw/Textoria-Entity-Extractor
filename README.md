@@ -14,7 +14,7 @@ Use the **Codex Skill** to save results directly into a local project, or use th
 
 ## Choose your workflow
 
-| | Codex | ChatGPT with uploaded files |
+| | Codex app (local) | ChatGPT with uploaded files |
 |---|---|---|
 | What to use | `SKILL.md` and `scripts/` | Only `prompt.md` |
 | Setup | Install the Skill once | Paste the prompt, or upload it with instructions to follow it |
@@ -22,9 +22,28 @@ Use the **Codex Skill** to save results directly into a local project, or use th
 | Result | Automatically saved in the project's `csv/` folder | A downloadable CSV when file-creation tools are available |
 | Working state | Local, resumable files | Depends on the tools and files accessible in that chat |
 
-## Install in Codex
+## Codex apps and plan requirements
 
-Codex needs access to a Python **3.9+** runtime. The scripts use only the Python standard library; there is no `pip install` step. URL input also requires network access. You do not need to run the extraction commands yourself.
+**For the local CSV workflow described below, use the Codex desktop app with a local project.** Official documentation now describes this surface as Codex in the ChatGPT desktop app. Codex CLI and the IDE extension also support standalone skills. The Skill needs file access and permission to run its Python scripts. See [official skill support](https://learn.chatgpt.com/docs/build-skills).
+
+Plan availability checked on **2026-10-18**:
+
+| Plan or access method | Using this Skill |
+|---|---|
+| ChatGPT Free / Go | Desktop Codex access is subject to rollout. If available on your account, you can try this Skill; Plus is not a mandatory minimum. |
+| ChatGPT Plus / Pro | Codex access includes web, CLI, and IDE surfaces; usage limits and available models vary by plan. |
+| ChatGPT Business / Enterprise / Edu | Codex is included; workspace administrators may restrict access or skills. |
+| API key | CLI or IDE use is possible with separately billed API usage; a ChatGPT subscription is not required for that route. |
+
+This Skill has no separate paid-plan requirement. Long texts consume your account's usage allowance; no plan guarantees a fixed number of complete extractions. Check [official pricing and availability](https://learn.chatgpt.com/docs/pricing) for current access.
+
+**Codex on the web / Cloud:** the local installation instructions below do not configure a cloud environment. Cloud tasks use their own workspace. To try this workflow there, make the Skill files, scripts, and source text available in that environment, explicitly ask Codex to follow `SKILL.md`, and retrieve the resulting CSV. This is an adaptation of the workflow, not verified cloud compatibility for this project. See [Codex Cloud setup](https://learn.chatgpt.com/docs/cloud).
+
+For an ordinary ChatGPT browser chat, use the separate `prompt.md` workflow below.
+
+## Install in local Codex
+
+You do not need to install Python in advance or run extraction commands yourself. On first use, the Skill checks for a compatible Python runtime and reuses one already available. If none is found, Codex attempts to install it using a method supported by your environment, requesting any required permission. If installation is blocked, Codex explains what is needed to continue. URL input also requires network access.
 
 ### Option 1: Ask Codex to install from GitHub
 

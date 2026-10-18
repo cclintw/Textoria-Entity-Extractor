@@ -15,7 +15,7 @@ Textoria 的主要目的，是為文本標註建立**可重複使用的外部實
 
 ## 選擇使用方式
 
-| | Codex | ChatGPT 附件對話 |
+| | Codex app（本機） | ChatGPT 附件對話 |
 |---|---|---|
 | 使用檔案 | `SKILL.md` 與 `scripts/` | 只需要 `prompt.md` |
 | 準備方式 | 安裝一次 Skill | 貼上提示詞，或上傳並要求依其操作 |
@@ -23,9 +23,28 @@ Textoria 的主要目的，是為文本標註建立**可重複使用的外部實
 | 交付方式 | 自動儲存在專案的 `csv/` | 有檔案建立工具時提供 CSV 下載 |
 | 工作進度 | 本機檔案保存，可續跑 | 依目前對話可用的工具與檔案而定 |
 
-## 在 Codex 安裝
+## 適用的 Codex 介面與帳號方案
 
-需要 Codex 可使用的 **Python 3.9 以上**環境。程式只使用 Python 標準函式庫，不必執行 `pip install`；網址來源另需網路存取能力。一般使用者不需要自己執行提取命令。
+**若要依下方流程將 CSV 直接儲存在本機專案，請使用 Codex 桌面應用程式，並開啟本機專案。** 官方現行文件將此介面稱為 ChatGPT 桌面應用程式中的 Codex。Codex CLI 與 IDE 擴充功能也支援獨立 Skill。執行時須允許讀寫工作檔及執行 Python 腳本。參考 [官方 Skill 支援說明](https://learn.chatgpt.com/docs/build-skills)。
+
+以下方案資訊查核於 **2026-10-18**：
+
+| 方案或登入方式 | 本 Skill 的使用條件 |
+|---|---|
+| ChatGPT Free／Go | 桌面版 Codex 依帳號逐步開放。帳號已開放即可嘗試本 Skill，並非必須訂閱 Plus。 |
+| ChatGPT Plus／Pro | Codex 存取包含網頁、CLI 與 IDE 等介面；可用模型及使用額度依方案而異。 |
+| ChatGPT Business／Enterprise／Edu | 包含 Codex，但工作區管理員可能限制存取或 Skill 使用。 |
+| API key | 可透過 CLI 或 IDE 使用，API 用量另外計費；此途徑不必訂閱 ChatGPT 付費方案。 |
+
+本 Skill 沒有另外要求特定付費方案。長文本提取會消耗帳號的使用額度，任何方案都不保證固定的完整提取次數。最新開放範圍請以 [官方方案與額度說明](https://learn.chatgpt.com/docs/pricing) 為準。
+
+**Codex 網頁版／Cloud：** 下方的本機安裝步驟不會設定雲端環境，雲端任務有自己的工作目錄。若要在雲端嘗試此流程，須先讓該環境取得 Skill 文件、腳本與來源文本，明確要求 Codex 依 `SKILL.md` 執行，再取回產生的 CSV。這是流程的延伸用法，本專案尚未驗證雲端相容性。參考 [Codex Cloud 設定說明](https://learn.chatgpt.com/docs/cloud)。
+
+若使用一般 ChatGPT 網頁對話，請採用下方獨立的 `prompt.md` 流程。
+
+## 在本機 Codex 安裝
+
+不需要事先自行安裝 Python，也不需要自己執行提取命令。首次使用時，Skill 會自動檢查並使用現有的相容 Python 環境；若找不到，Codex 會依目前環境支援的方式嘗試安裝，需要權限時才提出要求。若環境限制無法安裝，Codex 會說明繼續執行所需的協助。網址來源另需網路存取能力。
 
 ### 方法一：直接請 Codex 從 GitHub 下載安裝
 

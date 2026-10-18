@@ -57,6 +57,14 @@ Agent 逐片辨識這些名稱；匯出器也會將已確認的 alias 展開成�
 
 已知名稱提示保留重疊與巢狀匹配，不因較長名稱命中就隱藏短名稱。`known_matches.registry_ids` 只列與 surface 完全相同的名稱列；`alias_contexts` 另列來源語境提示，不能當成該 surface 的身分判定。簡稱只有 alias 提示而尚無自己的 name,type 列時，仍屬待收錄名稱。去重鍵只有 name,type，不以別名建立等價群組或進行身分合併。
 
+## 首次執行：自動準備 Python
+
+執行任何腳本前，由 Agent 自行偵測 Python 3.9 以上的可用執行環境，不要求使用者先安裝或自行操作命令。優先使用目前環境提供的 Python runtime（有 runtime 查詢工具時先查詢），再檢查系統的 `python3`、`python` 或 Windows 的 `py -3`。實際執行候選解譯器，確認 `sys.version_info >= (3, 9)`，不能只憑命令名稱判斷。
+
+若沒有相容版本，依作業系統及現有套件管理工具選擇受支援的安裝方式並嘗試安裝；安裝前依當時可用的官方文件確認方法。遵循環境的網路、寫入及權限流程，需要授權時提出具體安裝操作。優先使用使用者範圍的安裝，保留現有系統 Python。安裝後重新確認版本；若權限遭拒、無法連網或沒有可用安裝方式，停止依賴 Python 的步驟，說明具體阻礙與所需協助，不反覆重試或假稱已完成。
+
+腳本只使用標準函式庫，不需另裝 pip 套件。以下命令中的 `<PYTHON>` 代表已驗證的解譯器；Agent 執行時須替換為實際路徑（含空白時加引號），或實際驗證通過的 `py -3` 命令。後續所有步驟沿用同一解譯器，不假定 `python3` 必然存在。
+
 ## 首次執行與資料位置
 
 安裝時不建立資料目錄。第一次實際提取時，才在使用者專案建立：
@@ -85,9 +93,9 @@ Agent 逐片辨識這些名稱；匯出器也會將已確認的 alias 展開成�
 Agent 自行執行（腳本相對於本 Skill 所在目錄，不依賴 cwd）：
 
 ```bash
-python3 "<SKILL_DIR>/scripts/prepare_source.py" --input "<SOURCE>" --project "<PROJECT>"
+<PYTHON> "<SKILL_DIR>/scripts/prepare_source.py" --input "<SOURCE>" --project "<PROJECT>"
 # 或單一網頁
-python3 "<SKILL_DIR>/scripts/prepare_source.py" --url "<URL>" --project "<PROJECT>"
+<PYTHON> "<SKILL_DIR>/scripts/prepare_source.py" --url "<URL>" --project "<PROJECT>"
 ```
 
 本地文本保存副本；網址先把原始位元組另存 `source/`，才解碼、解析和清理 HTML，保留原始頁以便檢查。相同來源可重用副本，不同內容同名檔不得覆蓋。非 UTF-8 明確指定 `--encoding`，不以替代字元掩蓋編碼錯誤。PDF／Word 先由適當工具轉為文本。
@@ -101,7 +109,7 @@ python3 "<SKILL_DIR>/scripts/prepare_source.py" --url "<URL>" --project "<PROJEC
 300 字是預設工作參數，不是準確率保證或通用最佳值。優先保留句子與列舉的結構；實體密度、名稱邊界與上下文比固定字數更重要。
 
 ```bash
-python3 "<SKILL_DIR>/scripts/entity_pipeline.py" init --input "<PREPARED_INPUT>" --out "<WORK>" --chunk-chars 300 --overlap 40
+<PYTHON> "<SKILL_DIR>/scripts/entity_pipeline.py" init --input "<PREPARED_INPUT>" --out "<WORK>" --chunk-chars 300 --overlap 40
 ```
 
 - 先依空白行分原段落，再將超長段落切成最多 300 個 Unicode 字元（含標點）的片段。優先在後半段的句號、分號等斷開，次選逗號、頓號；無標點才硬切。
@@ -143,7 +151,7 @@ python3 "<SKILL_DIR>/scripts/entity_pipeline.py" init --input "<PREPARED_INPUT>"
 初始化後自動循環：
 
 ```bash
-python3 "<SKILL_DIR>/scripts/entity_pipeline.py" next --work "<WORK>" --max-paragraphs 4 --max-chars 1200
+<PYTHON> "<SKILL_DIR>/scripts/entity_pipeline.py" next --work "<WORK>" --max-paragraphs 4 --max-chars 1200
 ```
 
 讀取 batch.json 中全部 paragraphs 的 text、必要上下文及提示。主要回報新實體；已知項有新別名或歧義時可更新。每個片段都必須有一筆回應，沒有新項目時用空陣列：
@@ -155,7 +163,7 @@ python3 "<SKILL_DIR>/scripts/entity_pipeline.py" next --work "<WORK>" --max-para
 name 與 evidence 須為原文連續字串；evidence 僅供內部驗證。將回應實際寫入 `<WORK>/response.json` 後執行：
 
 ```bash
-python3 "<SKILL_DIR>/scripts/entity_pipeline.py" merge --work "<WORK>" --response "<WORK>/response.json"
+<PYTHON> "<SKILL_DIR>/scripts/entity_pipeline.py" merge --work "<WORK>" --response "<WORK>/response.json"
 ```
 
 失敗則修正重試，不跳過。繼續 next → 閱讀 → merge，直到 DONE。來源準備的版本識別碼與 init 的來源／切分指紋用來保護進度；相同設定續跑，設定不同則另建工作目錄。未讀完不能因新實體變少而停止，也不能宣稱完整。
@@ -163,7 +171,7 @@ python3 "<SKILL_DIR>/scripts/entity_pipeline.py" merge --work "<WORK>" --respons
 最後在內部確認 pending=0 再匯出：
 
 ```bash
-python3 "<SKILL_DIR>/scripts/entity_pipeline.py" export --work "<WORK>" --output-dir "<OUTPUT_DIR>" --timezone "<USER_TIMEZONE>"
+<PYTHON> "<SKILL_DIR>/scripts/entity_pipeline.py" export --work "<WORK>" --output-dir "<OUTPUT_DIR>" --timezone "<USER_TIMEZONE>"
 ```
 
 OUTPUT_DIR 為來源準備回傳的 csv/，USER_TIMEZONE 採對話提供的 IANA 時區，例如 Asia/Taipei；未提供才省略。只要兩欄時加 --no-alias。核對正式 CSV 存在、表頭與欄數正確、沒有重複 name+type、未混入日期時間或純數量。最後只提供實際檔案連結及必要說明，不列統計，也不要求使用者操作程式。
