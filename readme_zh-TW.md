@@ -281,7 +281,6 @@ ChatGPT 只能管理目前工具可存取的輸出，無法清除使用者已下
 | [scripts/](scripts/) | 來源準備、驗證、實體庫及 CSV 輔助程式 |
 | [prompt.md](prompt.md) | 可獨立使用的 ChatGPT 提示詞 |
 | [README.md](README.md) | 英文說明 |
-| [docs/design-rationale_zh-TW.md](docs/design-rationale_zh-TW.md) | 設計緣由、用途與增量提取演算法 |
 | [CITATION.cff](CITATION.cff) | 軟體引用資料 |
 | [LICENSE](LICENSE) | GPL v3 授權條款 |
 

@@ -283,7 +283,6 @@ ChatGPT applies this policy only to files its current tools can manage; it canno
 | [scripts/](scripts/) | Source preparation, validation, registry and CSV helpers |
 | [prompt.md](prompt.md) | Standalone instructions for ChatGPT |
 | [readme_zh-TW.md](readme_zh-TW.md) | Traditional Chinese documentation |
-| [docs/design-rationale_zh-TW.md](docs/design-rationale_zh-TW.md) | Motivation, intended use, and incremental extraction algorithm (Traditional Chinese) |
 | [CITATION.cff](CITATION.cff) | Software citation metadata |
 | [LICENSE](LICENSE) | GNU GPL v3 |
 
