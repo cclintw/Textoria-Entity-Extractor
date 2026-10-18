@@ -8,6 +8,8 @@ The project grew out of the difficulties of using AI to annotate long texts dire
 
 The project provides a **Codex Skill** and a standalone **ChatGPT prompt**. Both produce a `name,type,alias` CSV that you can review in a spreadsheet or adapt for tools such as MARKUS. The Codex app workflow also saves results and progress in your local project, so you can continue later.
 
+For a detailed project overview, please refer to: [textoria-incremental-entity-extraction/](https://cclin.cc/textoria-incremental-entity-extraction/)
+
 ## Choose your workflow
 
 | | Codex app (local) | ChatGPT with uploaded files |

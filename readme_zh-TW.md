@@ -8,6 +8,8 @@ Textoria 文本實體提取工具運用 AI，從文本或網頁中整理**名稱
 
 專案提供 **Codex Skill** 與獨立的 **ChatGPT 提示詞**，輸出皆為 `name,type,alias` CSV，可用試算表檢視，也可依 MARKUS 等工具的匯入要求調整後使用。Codex app 版本另可將成果與進度保存在本機專案，方便日後繼續處理。
 
+詳細專案介紹，請參閱 [Code Skill 實作 – 文本標註的外部詞表建置：增量式實體提取方法](https://cclin.cc/textoria-incremental-entity-extraction/)
+
 ## 選擇使用方式
 
 | | Codex app（本機） | ChatGPT 附件對話 |
