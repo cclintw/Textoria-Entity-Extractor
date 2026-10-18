@@ -32,9 +32,9 @@ After the repository is published, copy this instruction into Codex:
 
 ```text
 $skill-installer Install the skill from https://github.com/cclintw/textoria-entity-extractor.git.
-SKILL.md is at the repository root. Install it as textoria-entity-extractor,
-preserving SKILL.md and the scripts/ directory together.
 ```
+
+`SKILL.md` is at the repository root. The installation folder is named `textoria-entity-extractor`; keep `SKILL.md` and the `scripts/` directory together.
 
 Codex's installer can download the repository and install the Skill. **Opening a GitHub link alone does not install anything.** If network or filesystem permission is requested, follow your Codex environment's permission flow. The Skill should become available after installation; if it does not appear, restart Codex. See the [official OpenAI skill documentation](https://learn.chatgpt.com/docs/build-skills).
 

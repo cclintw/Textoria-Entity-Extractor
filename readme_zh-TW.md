@@ -33,9 +33,9 @@ Textoria 的主要目的，是為文本標註建立**可重複使用的外部實
 
 ```text
 $skill-installer 請從 https://github.com/cclintw/textoria-entity-extractor.git 下載並安裝 Skill。
-SKILL.md 位於 repository 根目錄，請以 textoria-entity-extractor 為安裝名稱，
-完整保留 SKILL.md 與 scripts/ 的相對位置。
 ```
+
+`SKILL.md` 位於 repository 根目錄。安裝資料夾名稱為 `textoria-entity-extractor`，須完整保留 `SKILL.md` 與 `scripts/` 的相對位置。
 
 Codex 的 Skill 安裝工具可協助下載與安裝。**只有點開 GitHub 網址不會自動安裝；需要把安裝要求交給 Codex。** 若環境要求網路或檔案權限，依該環境的流程處理。安裝完成後確認 Skill 是否出現，未出現時重新啟動 Codex。參考 [OpenAI 官方 Skill 說明](https://learn.chatgpt.com/docs/build-skills)。
 
