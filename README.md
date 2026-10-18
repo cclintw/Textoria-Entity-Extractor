@@ -1,6 +1,6 @@
 # Textoria Entity Extractor
 
-[繁體中文](readme_zh-TW.md) · [ChatGPT prompt](prompt.md) · [Codex Skill](SKILL.md) · [MIT License](LICENSE)
+[繁體中文](readme_zh-TW.md) · [ChatGPT prompt](prompt.md) · [Codex Skill](SKILL.md) · [GNU GPL v3](LICENSE)
 
 Textoria Entity Extractor uses AI to extract **names, types, and aliases** from texts and web pages, producing a reusable CSV reference list for text annotation. It covers people, places, organizations, works, and other entity types.
 
@@ -285,7 +285,7 @@ ChatGPT applies this policy only to files its current tools can manage; it canno
 | [readme_zh-TW.md](readme_zh-TW.md) | Traditional Chinese documentation |
 | [docs/design-rationale_zh-TW.md](docs/design-rationale_zh-TW.md) | Motivation, intended use, and incremental extraction algorithm (Traditional Chinese) |
 | [CITATION.cff](CITATION.cff) | Software citation metadata |
-| [LICENSE](LICENSE) | MIT License |
+| [LICENSE](LICENSE) | GNU GPL v3 |
 
 Runtime source texts, CSV files, working state, and Python caches are excluded by `.gitignore`. Keep the public Skill package separate from the materials processed with it.
 
@@ -305,11 +305,11 @@ Author and developer: **Chance Chun-Cheng Lin** (GitHub: [cclintw](https://githu
 
 [CITATION.cff](CITATION.cff) provides machine-readable citation metadata. Once it is committed to the repository's default branch, GitHub provides a **Cite this repository** link with APA and BibTeX options; see [GitHub's citation documentation](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-citation-files). Release-specific metadata can be added when a release is published.
 
-This suggested citation is separate from the MIT License's notice requirements. Input texts and third-party materials retain their own rights and source-attribution requirements; this project's license does not relicense them. Review extracted candidates before using them as an authoritative reference. This is an independent project and is not an official OpenAI product.
+This suggested citation is separate from the GNU GPL v3's notice requirements. Input texts and third-party materials retain their own rights and source-attribution requirements; this project's license does not relicense them. Review extracted candidates before using them as an authoritative reference. This is an independent project and is not an official OpenAI product.
 
 ## License
 
-Released under the [MIT License](LICENSE), Copyright © 2026 Chance Chun-Cheng Lin. You may use, modify, and redistribute the project under that license, including its notice and disclaimer terms. See [GitHub's licensing guide](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository).
+Released under the [GNU General Public License, version 3 only](LICENSE) (`GPL-3.0-only`), Copyright © 2026 Chance Chun-Cheng Lin. You may use, modify, and redistribute the project, including commercially. When distributing original or modified versions, preserve the required copyright, license, and warranty notices, mark modifications, and provide corresponding source code under GPL v3 as required by the license.
 
 ## Support the project
 

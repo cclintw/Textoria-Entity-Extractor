@@ -1,6 +1,6 @@
 # Textoria 文本實體提取工具
 
-[English](README.md) · [ChatGPT 提示詞](prompt.md) · [Codex Skill](SKILL.md) · [MIT 授權](LICENSE)
+[English](README.md) · [ChatGPT 提示詞](prompt.md) · [Codex Skill](SKILL.md) · [GPL v3 授權](LICENSE)
 
 Textoria 文本實體提取工具運用 AI，從文本或網頁中整理**名稱、類型與別名**，產生可重複使用的 CSV 實體清單，作為文本標註的參考詞表。提取範圍涵蓋人名、地名、機構、作品等多種實體。
 
@@ -283,7 +283,7 @@ ChatGPT 只能管理目前工具可存取的輸出，無法清除使用者已下
 | [README.md](README.md) | 英文說明 |
 | [docs/design-rationale_zh-TW.md](docs/design-rationale_zh-TW.md) | 設計緣由、用途與增量提取演算法 |
 | [CITATION.cff](CITATION.cff) | 軟體引用資料 |
-| [LICENSE](LICENSE) | MIT 授權條款 |
+| [LICENSE](LICENSE) | GPL v3 授權條款 |
 
 `.gitignore` 排除執行時產生的來源文本、CSV、工作紀錄及 Python 快取，發布 Skill 時不需一併提交處理過的素材。
 
@@ -309,11 +309,11 @@ Chance Chun-Cheng Lin。Textoria 文本實體提取工具：用於命名實體�
 
 [CITATION.cff](CITATION.cff) 提供機器可讀的引用資料。將它提交到 repository 的預設分支後，GitHub 會提供 **Cite this repository** 入口，可取得 APA 與 BibTeX 格式；參見 [GitHub 官方說明](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-citation-files)。正式發布 release 時，再補上該版本與發布日期。
 
-這是建議的學術引用方式，不另加 MIT 以外的授權條件。輸入文本與第三方素材仍依各自權利及來源標註要求處理，本專案的 MIT 授權不會替它們重新授權。提取結果是候選參考清單，作為權威資料前仍需檢視。本專案為獨立專案，非 OpenAI 官方產品。
+這是建議的學術引用方式，不另加 GPL v3 以外的授權條件。輸入文本與第三方素材仍依各自權利及來源標註要求處理，本專案的 GPL v3 授權不會替它們重新授權。提取結果是候選參考清單，作為權威資料前仍需檢視。本專案為獨立專案，非 OpenAI 官方產品。
 
 ## 授權
 
-本專案採用 [MIT License](LICENSE)，Copyright © 2026 Chance Chun-Cheng Lin。可依條款使用、修改及散布，並保留授權所要求的聲明與免責條款。授權說明可參考 [GitHub 官方指南](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository)。
+本專案採用 [GNU GPL 第 3 版，僅限此版本](LICENSE)（`GPL-3.0-only`），Copyright © 2026 Chance Chun-Cheng Lin。允許使用、修改、散布及商業販售。散布原版或修改版時，須保留必要的著作權、授權與免責聲明，標示修改，並依 GPL v3 規定以該授權提供對應原始碼。
 
 ## 支持專案
 
