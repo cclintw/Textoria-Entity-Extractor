@@ -33,24 +33,24 @@ Textoria 的主要目的，是為文本標註建立**可重複使用的外部實
 
 ```text
 $skill-installer 請從 https://github.com/cclintw/textoria-entity-extractor.git 下載並安裝 Skill。
-SKILL.md 位於 repository 根目錄，請以 textoria-incremental-entities 為安裝名稱，
+SKILL.md 位於 repository 根目錄，請以 textoria-entity-extractor 為安裝名稱，
 完整保留 SKILL.md 與 scripts/ 的相對位置。
 ```
 
 Codex 的 Skill 安裝工具可協助下載與安裝。**只有點開 GitHub 網址不會自動安裝；需要把安裝要求交給 Codex。** 若環境要求網路或檔案權限，依該環境的流程處理。安裝完成後確認 Skill 是否出現，未出現時重新啟動 Codex。參考 [OpenAI 官方 Skill 說明](https://learn.chatgpt.com/docs/build-skills)。
 
-GitHub 專案名稱可以和 Skill 名稱不同；安裝後的呼叫名稱仍為 `textoria-incremental-entities`。
+GitHub 專案名稱、Skill 安裝資料夾名稱與呼叫名稱統一為 `textoria-entity-extractor`。
 
 ### 方法二：手動下載安裝
 
 1. 開啟 [GitHub 專案頁面](https://github.com/cclintw/textoria-entity-extractor)，選擇 **Code → Download ZIP**。
-2. 解壓縮，建立名為 `textoria-incremental-entities` 的資料夾，內含 `SKILL.md`、完整的 `scripts/` 與 `LICENSE`，不要改變程式與 Skill 的相對位置。
+2. 解壓縮，建立名為 `textoria-entity-extractor` 的資料夾，內含 `SKILL.md`、完整的 `scripts/` 與 `LICENSE`，不要改變程式與 Skill 的相對位置。
 3. 放入目前 Codex 版本可辨識的 Skill 目錄。現行官方文件列出個人用的 `~/.agents/skills/`、專案用的 `<專案>/.agents/skills/`；部分版本及內建安裝工具使用 `~/.codex/skills/` 或 `$CODEX_HOME/skills/`，請以實際環境可辨識的位置為準，不要重複安裝。
 4. 確認 Codex 能找到 Skill，必要時重新啟動。
 
 ```text
 <可辨識的技能目錄>/
-└── textoria-incremental-entities/
+└── textoria-entity-extractor/
     ├── SKILL.md
     ├── LICENSE
     └── scripts/
@@ -65,14 +65,14 @@ Skill 安裝目錄與存放文本、CSV 的工作專案應分開。
 開啟工作專案，附加可讀取的文本或提供路徑，然後說：
 
 ```text
-請使用 $textoria-incremental-entities 提取這份文本的實體清單，
+請使用 $textoria-entity-extractor 提取這份文本的實體清單，
 自動儲存到目前專案，CSV 只要 name,type,alias 三欄。
 ```
 
 網址來源可以說：
 
 ```text
-請使用 $textoria-incremental-entities，從以下網址提取實體清單，
+請使用 $textoria-entity-extractor，從以下網址提取實體清單，
 自動儲存到目前專案：https://example.org/article
 ```
 

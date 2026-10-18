@@ -32,24 +32,24 @@ After the repository is published, copy this instruction into Codex:
 
 ```text
 $skill-installer Install the skill from https://github.com/cclintw/textoria-entity-extractor.git.
-SKILL.md is at the repository root. Install it as textoria-incremental-entities,
+SKILL.md is at the repository root. Install it as textoria-entity-extractor,
 preserving SKILL.md and the scripts/ directory together.
 ```
 
 Codex's installer can download the repository and install the Skill. **Opening a GitHub link alone does not install anything.** If network or filesystem permission is requested, follow your Codex environment's permission flow. The Skill should become available after installation; if it does not appear, restart Codex. See the [official OpenAI skill documentation](https://learn.chatgpt.com/docs/build-skills).
 
-The repository name and installed Skill name can differ: the Skill's invocation name remains `textoria-incremental-entities`.
+The repository name, installed Skill folder name, and invocation name are all `textoria-entity-extractor`.
 
 ### Option 2: Download and install manually
 
 1. Open [the repository](https://github.com/cclintw/textoria-entity-extractor) and choose **Code → Download ZIP**.
-2. Extract it. Create a folder named `textoria-incremental-entities` containing `SKILL.md`, the entire `scripts/` directory, and `LICENSE`. Keep their relative paths unchanged.
+2. Extract it. Create a folder named `textoria-entity-extractor` containing `SKILL.md`, the entire `scripts/` directory, and `LICENSE`. Keep their relative paths unchanged.
 3. Put that folder in a Skill directory recognized by your Codex installation. Current official locations include `~/.agents/skills/` for personal use and `<your-project>/.agents/skills/` for a project. Some installations, including the bundled installer, use `~/.codex/skills/` or `$CODEX_HOME/skills/`; follow the location recognized by your version and avoid duplicate installations.
 4. Check that Codex can discover the Skill. Restart if necessary.
 
 ```text
 <recognized-skills-directory>/
-└── textoria-incremental-entities/
+└── textoria-entity-extractor/
     ├── SKILL.md
     ├── LICENSE
     └── scripts/
@@ -64,14 +64,14 @@ Install the Skill separately from the project where you want to store source tex
 Open a working project, attach a readable text file or provide its path, and say:
 
 ```text
-Use $textoria-incremental-entities to extract entity names from this file.
+Use $textoria-entity-extractor to extract entity names from this file.
 Save the CSV in the current project. Use name,type,alias only.
 ```
 
 For a web page:
 
 ```text
-Use $textoria-incremental-entities to extract entity names from:
+Use $textoria-entity-extractor to extract entity names from:
 https://example.org/article
 Save the CSV in the current project.
 ```
