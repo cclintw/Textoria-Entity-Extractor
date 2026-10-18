@@ -48,24 +48,23 @@ During extraction, the Skill checks for a compatible Python runtime and reuses o
 Open the target project in Codex Desktop, copy the following request into that project's chat, and send it:
 
 ```text
-$skill-installer --repo cclintw/textoria-entity-extractor --path . --name textoria-entity-extractor --dest .agents/skills
+$skill-installer --repo cclintw/textoria-entity-extractor --path . --name textoria-entity-extractor --dest .
 ```
 
-`SKILL.md` is at the repository root. The installation folder is named `textoria-entity-extractor`; keep `SKILL.md` and the `scripts/` directory together.
+This invokes Codex's skill-installer in chat; it is not a terminal command. Codex resolves `--dest .` relative to the current project's root and downloads the complete repository into `<project>/textoria-entity-extractor/`. The installer stops if that folder already exists. Keep `SKILL.md`, `scripts/`, and the other repository files together so users can browse the code in the visible folder.
 
-This invokes Codex's skill-installer in chat; it is not a terminal command. Codex runs the bundled installer with the supplied options, resolving `.agents/skills` relative to the current project's root. The destination is `<project>/.agents/skills/textoria-entity-extractor/`. The installer stops if the destination already exists. After installation, check that `SKILL.md` and both Python scripts in `scripts/` are present. If the Skill does not appear, restart Codex. See the [official OpenAI skill documentation](https://learn.chatgpt.com/docs/build-skills).
-
-The repository name, installed Skill folder name, and invocation name are all `textoria-entity-extractor`.
+After downloading, register the Skill using the separate steps below.
 
 ### Option 2: Download and install manually
 
 1. Open [the repository](https://github.com/cclintw/textoria-entity-extractor) and choose **Code → Download ZIP**.
-2. Extract it. Create a folder named `textoria-entity-extractor` containing `SKILL.md`, the entire `scripts/` directory, and `LICENSE`. Keep their relative paths unchanged.
-3. Put the complete repository contents in `<your-project>/.agents/skills/textoria-entity-extractor/`. This Skill requires project-local installation rather than a personal shared directory. If your environment cannot discover that location, report the issue instead of silently switching to a shared installation.
-4. Check that Codex can discover the Skill. Restart if necessary.
+2. Extract it and name the extracted folder `textoria-entity-extractor`. Keep all repository files and their relative paths unchanged.
+3. Put the folder at `<your-project>/textoria-entity-extractor/`, then register the Skill using the steps below.
+
+Both methods produce the same visible folder structure:
 
 ```text
-<your-project>/.agents/skills/
+<your-project>/
 └── textoria-entity-extractor/
     ├── SKILL.md
     ├── LICENSE
@@ -74,7 +73,18 @@ The repository name, installed Skill folder name, and invocation name are all `t
         └── entity_pipeline.py
 ```
 
-Keep the Skill and processed materials in the same project, in separate directories: `.agents/skills/textoria-entity-extractor/` for the Skill, `source/` and `csv/` at the project root for texts and results, and `.textoria-entities/` for progress. The installer's default shared destination is not this Skill's installation policy.
+### Register the local Skill
+
+On macOS or Linux, run these commands in a terminal at the target project's root after either installation method. If `.agents/skills/textoria-entity-extractor` already exists, inspect it before proceeding; do not overwrite it or create a second copy inside it.
+
+```bash
+mkdir -p .agents/skills
+ln -s ../../textoria-entity-extractor .agents/skills/textoria-entity-extractor
+```
+
+Only the link lives in `.agents/skills/`; the actual files remain in the visible `textoria-entity-extractor/` folder. Codex supports linked Skill folders. If the environment cannot create or discover the link, report the specific issue. If the Skill does not appear, restart Codex. See the [official OpenAI skill documentation](https://learn.chatgpt.com/docs/build-skills).
+
+The repository name, installed folder name, and invocation name are all `textoria-entity-extractor`. Use the project-local copy rather than a personal shared installation. Texts and results remain in the project's visible `source/` and `csv/` folders; processing progress remains in `.textoria-entities/`. These data folders are created only when extraction first runs.
 
 ## Use in the Codex app
 

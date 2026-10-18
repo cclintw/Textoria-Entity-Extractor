@@ -77,15 +77,16 @@ Agent 逐片辨識這些名稱；匯出器也會將已確認的 alias 展開成�
 
 ## 安裝位置與首次執行
 
-此 Skill 固定安裝到使用者目前工作專案的 `<PROJECT>/.agents/skills/textoria-entity-extractor/`，完整保留 repository 中的 Skill 文件、`scripts/` 與其他隨附檔案的相對位置；不安裝到個人共用目錄。安裝器須明確指定 `--dest "<PROJECT>/.agents/skills"`，不能沿用其預設目的地。專案位置未知時才詢問目標專案。
+此 Skill 的完整 repository 固定放在使用者目前工作專案的可見資料夾 `<PROJECT>/textoria-entity-extractor/`，保留 Skill 文件、`scripts/` 與其他隨附檔案的相對位置；不把程式本體藏在 `.agents/skills/`，也不安裝到個人共用目錄。交給 `$skill-installer` 的安裝請求須指定 `--dest "<PROJECT>"`，不能沿用其預設目的地；專案位置未知時才詢問目標專案。安裝指令區塊只放指令，自然語言說明放在區塊外。
 
-安裝位置也必須寫在交給 `$skill-installer` 的安裝請求中，不能只依賴安裝後才載入的本文件。執行提取時使用本專案內的副本，不因共用目錄已有同名 Skill 就改用共用版本；若專案副本缺少必要腳本，回報安裝不完整，不另寫替代流程。
+下載後，在 `<PROJECT>/.agents/skills/textoria-entity-extractor` 建立指向 `<PROJECT>/textoria-entity-extractor/` 的目錄符號連結，供 Codex 辨識；該處只放連結，不存第二份程式。若連結位置已存在，先檢查，不覆寫或在既有目錄中再建立副本；若環境無法建立或辨識連結，回報具體問題。執行提取時，將 `<SKILL_DIR>` 解析為本專案內實際的 `textoria-entity-extractor/`；不因共用目錄已有同名 Skill 就改用共用版本。若專案副本缺少必要腳本，回報安裝不完整，不另寫替代流程。
 
 安裝時不建立資料目錄。第一次實際提取時，才在使用者專案建立：
 
 ```text
 <PROJECT>/
-├── .agents/skills/textoria-entity-extractor/  # 本專案的 Skill 與隨附程式
+├── textoria-entity-extractor/  # 可見的 Skill 文件與隨附程式
+├── .agents/skills/textoria-entity-extractor  # 指向上述資料夾的連結
 ├── source/                 # 原始文本／HTML 副本及必要的清理文本
 ├── csv/                    # 正式實體清單
 └── .textoria-entities/     # 來源、切片位置、回應、實體庫與進度

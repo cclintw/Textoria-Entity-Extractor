@@ -46,24 +46,23 @@ Textoria 文本實體提取工具運用 AI，從文本或網頁中整理**名稱
 在 Codex Desktop 開啟目標專案，複製下方安裝請求，貼到該專案的對話輸入框並送出：
 
 ```text
-$skill-installer --repo cclintw/textoria-entity-extractor --path . --name textoria-entity-extractor --dest .agents/skills
+$skill-installer --repo cclintw/textoria-entity-extractor --path . --name textoria-entity-extractor --dest .
 ```
 
-`SKILL.md` 位於 repository 根目錄。安裝資料夾名稱為 `textoria-entity-extractor`，須完整保留 `SKILL.md` 與 `scripts/` 的相對位置。
+這是對話中的 Skill 呼叫，不是終端機命令。Codex 將 `--dest .` 解析為目前專案根目錄，完整下載 repository 到 `<專案>/textoria-entity-extractor/`；目的資料夾已存在時會停止。`SKILL.md`、`scripts/` 與其他隨附檔案須保留在一起，使用者可直接在可見資料夾中閱讀程式碼。
 
-這是對話中的 Skill 呼叫，不是終端機命令。Codex 依所列參數執行隨附安裝腳本，將 `.agents/skills` 解析為目前專案根目錄下的位置，實際安裝到 `<專案>/.agents/skills/textoria-entity-extractor/`；目的資料夾已存在時會停止。安裝後確認 `SKILL.md` 與 `scripts/` 內兩支 Python 程式皆存在。若 Skill 未出現，重新啟動 Codex。參考 [OpenAI 官方 Skill 說明](https://learn.chatgpt.com/docs/build-skills)。
-
-GitHub 專案名稱、Skill 安裝資料夾名稱與呼叫名稱統一為 `textoria-entity-extractor`。
+下載後，依下方獨立步驟註冊 Skill。
 
 ### 方法二：手動下載安裝
 
 1. 開啟 [GitHub 專案頁面](https://github.com/cclintw/textoria-entity-extractor)，選擇 **Code → Download ZIP**。
-2. 解壓縮，建立名為 `textoria-entity-extractor` 的資料夾，內含 `SKILL.md`、完整的 `scripts/` 與 `LICENSE`，不要改變程式與 Skill 的相對位置。
-3. 將完整 repository 內容放入 `<專案>/.agents/skills/textoria-entity-extractor/`。本 Skill 固定採專案內安裝，不使用個人共用目錄。若目前環境無法辨識此位置，回報具體問題，不自行改成共用安裝。
-4. 確認 Codex 能找到 Skill，必要時重新啟動。
+2. 解壓縮，將解壓縮後的資料夾命名為 `textoria-entity-extractor`，完整保留所有 repository 檔案及其相對位置。
+3. 將資料夾放入 `<專案>/textoria-entity-extractor/`，再依下方步驟註冊 Skill。
+
+兩種方法都使用相同的可見資料夾結構：
 
 ```text
-<專案>/.agents/skills/
+<專案>/
 └── textoria-entity-extractor/
     ├── SKILL.md
     ├── LICENSE
@@ -72,7 +71,18 @@ GitHub 專案名稱、Skill 安裝資料夾名稱與呼叫名稱統一為 `texto
         └── entity_pipeline.py
 ```
 
-Skill 程式與文本資料都位於同一工作專案內，但分開存放：Skill 在 `.agents/skills/textoria-entity-extractor/`，文本與成果在專案根目錄的 `source/`、`csv/`，處理進度在 `.textoria-entities/`。安裝器的共用目錄預設值不是本 Skill 的安裝規格。
+### 註冊本機 Skill
+
+macOS 或 Linux 完成任一安裝方法後，在目標專案根目錄的終端機執行以下命令。若 `.agents/skills/textoria-entity-extractor` 已存在，先檢查既有內容，不覆寫，也不在其中再建立一份副本。
+
+```bash
+mkdir -p .agents/skills
+ln -s ../../textoria-entity-extractor .agents/skills/textoria-entity-extractor
+```
+
+`.agents/skills/` 只放連結，實際檔案仍在可見的 `textoria-entity-extractor/`。Codex 支援透過符號連結讀取 Skill；若環境無法建立或辨識連結，回報具體問題。若 Skill 未出現，重新啟動 Codex。參考 [OpenAI 官方 Skill 說明](https://learn.chatgpt.com/docs/build-skills)。
+
+GitHub 專案名稱、安裝資料夾名稱與呼叫名稱統一為 `textoria-entity-extractor`，使用專案內副本，不使用個人共用安裝。文本與成果仍存放在專案可見的 `source/`、`csv/`，處理進度仍存放在 `.textoria-entities/`；這些資料目錄只在第一次實際提取時建立。
 
 ## Codex app 使用方式
 
