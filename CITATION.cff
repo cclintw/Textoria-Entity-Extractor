@@ -1,0 +1,18 @@
+cff-version: "1.2.0"
+message: "If you use this software, please cite it using these metadata and record the release or commit used."
+type: software
+title: "Textoria Entity Extractor: A Codex Skill and ChatGPT Prompt for Named Entity Extraction"
+authors:
+  - family-names: "Lin"
+    given-names: "Chance Chun-Cheng"
+    website: "https://github.com/cclintw"
+repository-code: "https://github.com/cclintw/textoria-entity-extractor"
+url: "https://github.com/cclintw/textoria-entity-extractor"
+license: MIT
+abstract: "A Codex skill and standalone ChatGPT prompt for extracting entity-name reference CSV files from texts and web pages."
+keywords:
+  - "named entity extraction"
+  - "Chinese texts"
+  - "digital humanities"
+  - "Codex"
+  - "ChatGPT"
