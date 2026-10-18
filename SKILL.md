@@ -1,5 +1,5 @@
 ---
-name: textoria-incremental-entities
+name: textoria-entity-extractor
 description: 從文本檔、HTML 或單一網頁網址提取命名實體，建立供其他文本標註使用的外部參考 CSV。逐片段以 LLM 辨識 name、英文 type 與可選 alias，增量去重；自動保存來源、切分長段落並保留進度，不需使用者操作 Python。
 ---
 
