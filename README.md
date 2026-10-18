@@ -78,35 +78,25 @@ The repository name, installed Skill folder name, and invocation name are all `t
 
 Install the Skill separately from the project where you want to store source texts and CSV files.
 
-## Use in Codex
+## Use in the Codex app
 
-Open a working project, attach a readable text file or provide its path, and say:
-
-```text
-Use $textoria-entity-extractor to extract entity names from this file.
-Save the CSV in the current project. Use name,type,alias only.
-```
-
-For a web page:
+Open a local project, upload a text file, and say:
 
 ```text
-Use $textoria-entity-extractor to extract entity names from:
-https://example.org/article
-Save the CSV in the current project.
+Extract an entity list from the uploaded text.
 ```
 
-The Skill prepares the source, splits long paragraphs, reads every chunk, merges name entries, checks the result, and saves the CSV. **In Codex, the file is already saved locally; no separate download is needed.** If no working project can be identified, Codex asks where to save the data.
-
-On the first extraction, these directories are created in the working project, not in the installed Skill folder:
+You can also provide a local file path or a web page URL:
 
 ```text
-working-project/
-├── source/                 # Original text/HTML and any cleaned text
-├── csv/                    # Final reference CSVs
-└── .textoria-entities/     # Source records, registry, progress and export history
+Extract an entity list from https://example.org/article
 ```
 
-For a URL, the original page is saved before HTML cleaning. Existing entity markup is a contextual hint, not a final classification. A single static HTML or plain-text page is supported directly; dynamic pages, authentication, multipage works, PDF, or Word may require other tools to obtain the complete text first.
+The CSV is automatically saved in the project's `csv/` folder with `name,type,alias` columns. No separate download is needed. If the source or save location is unclear, Codex asks you to clarify.
+
+If no readable upload is available, Codex checks `uploads/` first, then other project files, and asks which text to use before extracting. If no file was uploaded and no project text is found, it prompts: “Please upload the text you want to extract entities from.”
+
+You do not need to describe the processing steps or mention the Skill by name. If it is not selected automatically, explicitly mention `$textoria-entity-extractor`. Requests for summaries, translations, or other work are handled according to your intent; unclear requests are clarified first.
 
 ## Use in ChatGPT
 
