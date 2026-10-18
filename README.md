@@ -49,6 +49,11 @@ Click **Copy** on the block below, paste it into a **Codex app chat**, and send 
 
 ```text
 $skill-installer https://github.com/cclintw/textoria-entity-extractor.git
+Install the complete repository root into the current project's
+.agents/skills/textoria-entity-extractor/, not a personal shared directory.
+Explicitly pass --dest pointing to the current project's .agents/skills,
+with --path . --name textoria-entity-extractor.
+Verify SKILL.md and both Python scripts in scripts/, and report the actual install path.
 ```
 
 `SKILL.md` is at the repository root. The installation folder is named `textoria-entity-extractor`; keep `SKILL.md` and the `scripts/` directory together.
@@ -61,11 +66,11 @@ The repository name, installed Skill folder name, and invocation name are all `t
 
 1. Open [the repository](https://github.com/cclintw/textoria-entity-extractor) and choose **Code → Download ZIP**.
 2. Extract it. Create a folder named `textoria-entity-extractor` containing `SKILL.md`, the entire `scripts/` directory, and `LICENSE`. Keep their relative paths unchanged.
-3. Put that folder in a Skill directory recognized by your Codex installation. Current official locations include `~/.agents/skills/` for personal use and `<your-project>/.agents/skills/` for a project. Some installations, including the bundled installer, use `~/.codex/skills/` or `$CODEX_HOME/skills/`; follow the location recognized by your version and avoid duplicate installations.
+3. Put the complete repository contents in `<your-project>/.agents/skills/textoria-entity-extractor/`. This Skill requires project-local installation rather than a personal shared directory. If your environment cannot discover that location, report the issue instead of silently switching to a shared installation.
 4. Check that Codex can discover the Skill. Restart if necessary.
 
 ```text
-<recognized-skills-directory>/
+<your-project>/.agents/skills/
 └── textoria-entity-extractor/
     ├── SKILL.md
     ├── LICENSE
@@ -74,7 +79,7 @@ The repository name, installed Skill folder name, and invocation name are all `t
         └── entity_pipeline.py
 ```
 
-Install the Skill separately from the project where you want to store source texts and CSV files.
+Keep the Skill and processed materials in the same project, in separate directories: `.agents/skills/textoria-entity-extractor/` for the Skill, `source/` and `csv/` at the project root for texts and results, and `.textoria-entities/` for progress. The installer's default shared destination is not this Skill's installation policy.
 
 ## Use in the Codex app
 
@@ -222,13 +227,14 @@ name,type,alias
 有檔案工具時：
 
 - 實際建立 UTF-8 BOM 的 `.csv` 檔，正確處理逗號、雙引號、換行與空 alias；依 type、name 排序。
-- 每個來源最多保留最近三份 CSV，命名為 `<文本ID>-YYYYMMDD-HHMMSS-ffffff.csv`。文本ID為穩定來源識別碼，日期時間標示版本先後，微秒用來區分同秒多次匯出。不使用 v1/v2/v3 循環檔位，也不以新內容覆蓋舊日期檔名。第四份成功建立後，刪除同一文本ID最早的一份；不同來源各自保留最近三份。
+- 每個來源最多保留最近三份 CSV，命名為 `<文本ID>-YYYYMMDD-HHMMSS-ffffff.csv`。文本ID預設採原始檔名去掉副檔名，保留中文與編號，清理不適合作為檔名的字元，過長時截短；網址採路徑檔名，無檔名時採主機名稱。不同來源同名時附加短來源識別碼，後續沿用。日期時間標示版本先後，微秒用來區分同秒多次匯出。不使用 v1/v2/v3 循環檔位，也不以新內容覆蓋舊日期檔名。第四份成功建立後，刪除同一文本ID最早的一份；不同來源各自保留最近三份。
 - 同一附件來源的新內容版本仍沿用來源識別，不以內容雜湊或本次暫存路徑另開一組 CSV。可用原始檔名及已知來源資訊建立穩定來源鍵，再產生短識別碼；同名但明確不同來源的檔案要區分，確實無法判定時才詢問。網址來源以原網址識別，忽略 fragment、保留 query。不得把例中名稱當成實際來源。
 - 來源名稱、輸出時間與累計次序保存在內部版本索引，這些紀錄不加入實體表欄位。同一來源使用一致時間基準命名，並避免重用已用過的時間戳；無法確認時間時先說明，不捏造日期。先完整寫好新 CSV，再清理超過上限的最早檔案；不能先刪舊檔才嘗試寫新檔。舊固定檔位須依實際匯出紀錄改名，不能把 v1 認作最早版本。
 - 保留上限只適用於目前工具可管理的輸出檔案；不能刪除已下載到我電腦的副本，也不能假稱清理了無法操作的歷史附件或其他對話。若工具無法刪除原檔，明確說明該限制；有可管理工作區時依版本索引維持每來源最多三個輸出檔。
 - 確認原文已完整處理、所有 name 存在於原文、類型符合規則、沒有重複 name+type、表頭及欄數正確，並且輸出檔確實可供下載。
 
 完成時簡短回覆 CSV 的實際下載連結，不列筆數、各類型數量或長篇分析。只有必要時附一行限制說明；未完成時須明確說明，不能假稱完整成果。
+
 ````
 <!-- END PROMPT.MD -->
 
@@ -265,15 +271,18 @@ Supported types:
 4. Validate source evidence, retain overlapping name hints, and deduplicate by `name,type` without merging identities through aliases.
 5. Export the complete inventory. Short chunks are an operating choice, not a guarantee of perfect recall; incomplete runs must be reported as incomplete.
 
+The Codex workflow uses one Agent and one work directory per source version. It does not ask you to choose an agent count or create `worker*` folders, `advance.py`, or `consolidate.py`. The bundled scripts manage preparation, progress, merging, and export. Multi-agent extraction requires a separate workflow change.
+
 ## Filenames and retention
 
 ```text
-csv/<source-id>-YYYYMMDD-HHMMSS-ffffff.csv
+csv/<original-filename-stem>-YYYYMMDD-HHMMSS-ffffff.csv
+# Example: 004臺灣府志_1-20261018-211940-174342.csv
 ```
 
 Each source keeps its **three most recent CSVs**. A new file is written first; once it succeeds, the oldest file for that same source is deleted if the limit is exceeded. Filenames are never recycled as `v1`, `v2`, or `v3`.
 
-The local workflow identifies a source by its original absolute file path or requested URL. Content changes at the same source do not create a new retention group. Different sources have different IDs; renaming or moving the original local file makes it a different source. Timestamps include microseconds to distinguish multiple exports in one second. Internal records retain the source name and export history.
+The local workflow identifies a source by its original absolute file path or requested URL. Content changes at the same source do not create a new retention group. Different sources have different IDs; renaming or moving the original local file makes it a different source. Timestamps include microseconds to distinguish multiple exports in one second. The visible text ID uses the original filename without its extension (with unsafe characters cleaned and long names shortened), or the URL path filename with a hostname fallback. When different sources share a text ID, a short source ID is appended for the later source. The internal path/URL hash remains the retention key. Existing hash-named CSVs count toward the same three-file limit; future exports use the readable text ID without bulk-renaming old files. Internal records retain the source name and export history.
 
 ChatGPT applies this policy only to files its current tools can manage; it cannot clean up copies already downloaded to someone else's computer or inaccessible chat attachments.
 

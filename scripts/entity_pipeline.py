@@ -64,6 +64,18 @@ def atomic_bytes(path,data):
 def timestamped_path(folder,source_id,stamp):
     return folder/f"{source_id}-{stamp.strftime('%Y%m%d-%H%M%S-%f')}.csv"
 
+def export_text_id(source,sources):
+    """Use the source filename stem; disambiguate same-name sources in this project."""
+    label=source['source_label']
+    reserved={unicodedata.normalize('NFC',s.get('text_id',s['source_id'])).casefold()
+              for s in sources.values() if s['source_id']!=source['source_id']}
+    candidate=label
+    if unicodedata.normalize('NFC',candidate).casefold() in reserved:
+        candidate=f"{label}-{source['source_id']}"
+    while unicodedata.normalize('NFC',candidate).casefold() in reserved:
+        candidate+='_'+source['source_id']
+    return candidate
+
 def commit_versions(index_path,index,folder,cleanup):
     # Remember cleanup until it succeeds, so interruptions cannot orphan expired versions.
     paths=list(dict.fromkeys([*index.get('pending_deletions',[]),*(str(p) for p in cleanup)]))
@@ -120,6 +132,8 @@ def rotate_csv(folder,source,data,exported_at,work,columns):
             **source,'total_exports':0,'versions':[]})
         if state['source_key']!=source['source_key']:raise ValueError('Source identifier collision')
         cleanup=migrate_slot_state(folder,state)
+        # Keep retention keyed by source_id, including exports with legacy hash filenames.
+        if not state.get('text_id'):state['text_id']=export_text_id(source,index['sources'])
         generation=state['total_exports']+1
         stamp=datetime.fromisoformat(exported_at)
         if stamp.tzinfo is None:stamp=stamp.replace(tzinfo=timezone.utc)
@@ -127,12 +141,12 @@ def rotate_csv(folder,source,data,exported_at,work,columns):
             last=datetime.fromisoformat(state['last_filename_at'])
             stamp=stamp.astimezone(last.tzinfo)
             if stamp<=last:stamp=last+timedelta(microseconds=1)
-        output=timestamped_path(folder,source['source_id'],stamp)
+        output=timestamped_path(folder,state['text_id'],stamp)
         while output.exists():
-            stamp+=timedelta(microseconds=1);output=timestamped_path(folder,source['source_id'],stamp)
+            stamp+=timedelta(microseconds=1);output=timestamped_path(folder,state['text_id'],stamp)
         atomic_bytes(output,data)
         entry={'output':str(output),'exported_at':exported_at,'work':str(Path(work).resolve()),
-               'generation':generation,'filename_at':stamp.isoformat(),'columns':columns,'source_id':source['source_id'],
+               'generation':generation,'filename_at':stamp.isoformat(),'columns':columns,'source_id':source['source_id'],'text_id':state['text_id'],
                'alias_semantics':'source_context_not_global_identity'}
         state['total_exports']=generation
         state['last_filename_at']=stamp.isoformat()
