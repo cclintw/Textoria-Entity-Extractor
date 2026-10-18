@@ -41,24 +41,19 @@ For an ordinary ChatGPT browser chat, use the separate `prompt.md` workflow belo
 
 ## Install in local Codex
 
-You do not need to install Python in advance or run extraction commands yourself. On first use, the Skill checks for a compatible Python runtime and reuses one already available. If none is found, Codex attempts to install it using a method supported by your environment, requesting any required permission. If installation is blocked, Codex explains what is needed to continue. URL input also requires network access.
+During extraction, the Skill checks for a compatible Python runtime and reuses one already available. If none is found, Codex attempts to install it using a method supported by your environment, requesting any required permission. If installation is blocked, Codex explains what is needed to continue. URL input also requires network access.
 
-### Option 1: Ask Codex to install from GitHub
+### Option 1: Install in a Codex Desktop chat
 
-Click **Copy** on the block below, paste it into a **Codex app chat**, and send it to request installation:
+Open the target project in Codex Desktop, copy the following request into that project's chat, and send it:
 
 ```text
-$skill-installer https://github.com/cclintw/textoria-entity-extractor.git
-Install the complete repository root into the current project's
-.agents/skills/textoria-entity-extractor/, not a personal shared directory.
-Explicitly pass --dest pointing to the current project's .agents/skills,
-with --path . --name textoria-entity-extractor.
-Verify SKILL.md and both Python scripts in scripts/, and report the actual install path.
+$skill-installer --repo cclintw/textoria-entity-extractor --path . --name textoria-entity-extractor --dest .agents/skills
 ```
 
 `SKILL.md` is at the repository root. The installation folder is named `textoria-entity-extractor`; keep `SKILL.md` and the `scripts/` directory together.
 
-Codex's installer can download the repository and install the Skill. **Opening a GitHub link alone does not install anything.** If network or filesystem permission is requested, follow your Codex environment's permission flow. The Skill should become available after installation; if it does not appear, restart Codex. See the [official OpenAI skill documentation](https://learn.chatgpt.com/docs/build-skills).
+This invokes Codex's skill-installer in chat; it is not a terminal command. Codex runs the bundled installer with the supplied options, resolving `.agents/skills` relative to the current project's root. The destination is `<project>/.agents/skills/textoria-entity-extractor/`. The installer stops if the destination already exists. After installation, check that `SKILL.md` and both Python scripts in `scripts/` are present. If the Skill does not appear, restart Codex. See the [official OpenAI skill documentation](https://learn.chatgpt.com/docs/build-skills).
 
 The repository name, installed Skill folder name, and invocation name are all `textoria-entity-extractor`.
 

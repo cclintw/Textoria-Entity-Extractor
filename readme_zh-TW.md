@@ -41,22 +41,17 @@ Textoria 文本實體提取工具運用 AI，從文本或網頁中整理**名稱
 
 ## 在本機 Codex 安裝
 
-### 方法一：直接請 Codex 從 GitHub 下載安裝
+### 方法一：在 Codex Desktop 對話中安裝
 
-點選下方區塊的 **Copy／複製**，貼到 **Codex app 的對話輸入框**並送出，即可要求安裝：
+在 Codex Desktop 開啟目標專案，複製下方安裝請求，貼到該專案的對話輸入框並送出：
 
 ```text
-$skill-installer https://github.com/cclintw/textoria-entity-extractor.git
-請將 repository 根目錄的完整內容安裝到目前工作專案的
-.agents/skills/textoria-entity-extractor/，不要安裝到個人共用目錄。
-執行安裝器時明確指定 --dest 為目前專案的 .agents/skills，
-並使用 --path . --name textoria-entity-extractor。
-完成後核對 SKILL.md 與 scripts/ 內兩支 Python 程式皆存在，回報實際安裝路徑。
+$skill-installer --repo cclintw/textoria-entity-extractor --path . --name textoria-entity-extractor --dest .agents/skills
 ```
 
 `SKILL.md` 位於 repository 根目錄。安裝資料夾名稱為 `textoria-entity-extractor`，須完整保留 `SKILL.md` 與 `scripts/` 的相對位置。
 
-Codex 的 Skill 安裝工具可協助下載與安裝。**只有點開 GitHub 網址不會自動安裝；需要把安裝要求交給 Codex。** 若環境要求網路或檔案權限，依該環境的流程處理。安裝完成後確認 Skill 是否出現，未出現時重新啟動 Codex。參考 [OpenAI 官方 Skill 說明](https://learn.chatgpt.com/docs/build-skills)。
+這是對話中的 Skill 呼叫，不是終端機命令。Codex 依所列參數執行隨附安裝腳本，將 `.agents/skills` 解析為目前專案根目錄下的位置，實際安裝到 `<專案>/.agents/skills/textoria-entity-extractor/`；目的資料夾已存在時會停止。安裝後確認 `SKILL.md` 與 `scripts/` 內兩支 Python 程式皆存在。若 Skill 未出現，重新啟動 Codex。參考 [OpenAI 官方 Skill 說明](https://learn.chatgpt.com/docs/build-skills)。
 
 GitHub 專案名稱、Skill 安裝資料夾名稱與呼叫名稱統一為 `textoria-entity-extractor`。
 
