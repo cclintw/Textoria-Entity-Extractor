@@ -10,7 +10,6 @@ Textoria 的主要目的，是為文本標註建立**可重複使用的外部實
 
 在 **Codex** 中，Skill 與 Python 程式負責來源準備、分段、已知名稱比對、驗證、實體庫更新、進度及 CSV 儲存，語意提取由 Agent 的 LLM 完成；在 **ChatGPT** 中，則使用獨立提示詞，依對話可用工具執行與交付檔案。
 
-完整設計說明請見：[文本標註的外部詞表建置：Textoria 的增量式實體提取方法](docs/design-rationale_zh-TW.md)。
 
 > **GitHub 專案名稱：** `textoria-entity-extractor`；英文名稱為 **Textoria Entity Extractor**，中文名稱為 **Textoria 文本實體提取工具**。以下連結採用已確認的專案名稱，正式發布後即可使用。
 

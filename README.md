@@ -10,8 +10,6 @@ The result is a reusable `name,type,alias` CSV, rather than an annotated text. I
 
 Use the **Codex Skill** to save results directly into a local project, or use the standalone **ChatGPT prompt** with uploaded files and file-creation tools. The Codex implementation uses Python for preparation, chunking, known-name matching, validation, registry updates, progress tracking, and export; the agent's LLM performs semantic extraction. The ChatGPT prompt follows the same approach, with persistence depending on the tools available in that chat.
 
-Read the [Traditional Chinese article on the motivation and algorithm](docs/design-rationale_zh-TW.md) for the full design explanation.
-
 > **Repository:** `textoria-entity-extractor` · **Project name:** Textoria Entity Extractor. The links below use the confirmed repository name and will become available after publication.
 
 ## Choose your workflow
