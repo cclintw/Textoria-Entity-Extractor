@@ -2,15 +2,11 @@
 
 [繁體中文](readme_zh-TW.md) · [ChatGPT prompt](prompt.md) · [Codex Skill](SKILL.md) · [MIT License](LICENSE)
 
-Textoria Entity Extractor builds the **external entity dictionary needed for text annotation**. Its central idea is to separate entity-name extraction from annotation: use an LLM to identify names and types first, then reuse the resulting CSV as a custom dictionary in a matching program or an annotation platform. Annotation can then proceed without an LLM, subject to the downstream tool's format and matching rules.
+Textoria Entity Extractor uses AI to extract **names, types, and aliases** from texts and web pages, producing a reusable CSV reference list for text annotation. It covers people, places, organizations, works, and other entity types.
 
-The project grew out of the difficulty of asking an LLM to annotate a long text directly. Context limits, lengthy outputs, and repeated decisions about recurring names can make that workflow slow, token-intensive, and difficult to keep consistent. Asking for an entity list from the entire text at once can encounter similar problems. Textoria instead reads the source in order, in small overlapping chunks, and **incrementally updates an entity registry**. Previously extracted names that occur in the next batch are supplied as reference hints; the model focuses its output on new names and necessary updates while still reading every chunk in full.
+The project grew out of the difficulties of using AI to annotate long texts directly: names can be missed, recurring names can receive inconsistent treatment, and long outputs can be difficult to review. Textoria separates building an entity list from annotating the text, so you can review and reuse the list with annotation tools.
 
-The result is a reusable `name,type,alias` CSV, rather than an annotated text. It can seed a dictionary for the same source or related texts; workflows targeting platforms such as MARKUS may require column and type mapping. This design aims to reduce repeated output and support more consistent extraction, but improvements in accuracy, runtime, and token use have not yet been quantified through comparative evaluation.
-
-Use the **Codex Skill** to save results directly into a local project, or use the standalone **ChatGPT prompt** with uploaded files and file-creation tools. The Codex implementation uses Python for preparation, chunking, known-name matching, validation, registry updates, progress tracking, and export; the agent's LLM performs semantic extraction. The ChatGPT prompt follows the same approach, with persistence depending on the tools available in that chat.
-
-> **Repository:** `textoria-entity-extractor` · **Project name:** Textoria Entity Extractor. The links below use the confirmed repository name and will become available after publication.
+The project provides a **Codex Skill** and a standalone **ChatGPT prompt**. Both produce a `name,type,alias` CSV that you can review in a spreadsheet or adapt for tools such as MARKUS. The Codex app workflow also saves results and progress in your local project, so you can continue later.
 
 ## Choose your workflow
 
@@ -47,10 +43,10 @@ You do not need to install Python in advance or run extraction commands yourself
 
 ### Option 1: Ask Codex to install from GitHub
 
-After the repository is published, copy this instruction into Codex:
+Click **Copy** on the block below, paste it into a **Codex app chat**, and send it to request installation:
 
 ```text
-$skill-installer Install the skill from https://github.com/cclintw/textoria-entity-extractor.git.
+$skill-installer https://github.com/cclintw/textoria-entity-extractor.git
 ```
 
 `SKILL.md` is at the repository root. The installation folder is named `textoria-entity-extractor`; keep `SKILL.md` and the `scripts/` directory together.

@@ -2,16 +2,11 @@
 
 [English](README.md) · [ChatGPT 提示詞](prompt.md) · [Codex Skill](SKILL.md) · [MIT 授權](LICENSE)
 
-Textoria 的主要目的，是為文本標註建立**可重複使用的外部實體詞表**。它將「提取實體名稱」與「標註文本」分開：先利用 LLM 辨識名稱與類型，輸出參考 CSV；再把這份清單作為自訂詞表，交給一般比對程式或標註平台使用。下游可依自己的格式與規則進行標註，不一定需要再次使用 LLM。
+Textoria 文本實體提取工具運用 AI，從文本或網頁中整理**名稱、類型與別名**，產生可重複使用的 CSV 實體清單，作為文本標註的參考詞表。提取範圍涵蓋人名、地名、機構、作品等多種實體。
 
-本專案源於直接請 LLM 標註長文本時的實務困難：上下文容量有限、標註輸出冗長，同一名稱又須反覆判讀，容易造成耗時、token 消耗與結果不一致。即使只要求一次從全文列出實體，也可能遇到遺漏或輸出不完整。因此，Textoria 採用**增量提取**：按文本順序逐章、逐段閱讀，將長段落切成帶重疊的小片段，每批提取後更新實體庫，再把下一批文本中出現的已知名稱提供為參考。模型仍須完整閱讀每個片段，但主要回報新名稱及必要的更新。
+本專案源於使用 AI 直接標註長文本時，容易遇到漏提、同名判讀不一致，以及輸出過長而難以檢查的問題。因此，Textoria 將「建立實體清單」與「標註文本」分開，讓使用者先檢查、整理名稱，再將清單交給標註工具重複使用。
 
-最終成果是 `name,type,alias` 清單，可作為原文本或相關文本的標註參考；若用於 MARKUS 等平台，須依其匯入格式轉換欄位與類型。此設計希望減少重複輸出、改善提取的一致性；準確率、執行時間與 token 用量的改善幅度，仍待比較實驗驗證。
-
-在 **Codex** 中，Skill 與 Python 程式負責來源準備、分段、已知名稱比對、驗證、實體庫更新、進度及 CSV 儲存，語意提取由 Agent 的 LLM 完成；在 **ChatGPT** 中，則使用獨立提示詞，依對話可用工具執行與交付檔案。
-
-
-> **GitHub 專案名稱：** `textoria-entity-extractor`；英文名稱為 **Textoria Entity Extractor**，中文名稱為 **Textoria 文本實體提取工具**。以下連結採用已確認的專案名稱，正式發布後即可使用。
+專案提供 **Codex Skill** 與獨立的 **ChatGPT 提示詞**，輸出皆為 `name,type,alias` CSV，可用試算表檢視，也可依 MARKUS 等工具的匯入要求調整後使用。Codex app 版本另可將成果與進度保存在本機專案，方便日後繼續處理。
 
 ## 選擇使用方式
 
@@ -46,10 +41,10 @@ Textoria 的主要目的，是為文本標註建立**可重複使用的外部實
 
 ### 方法一：直接請 Codex 從 GitHub 下載安裝
 
-專案發布後，將以下指令複製到 Codex：
+點選下方區塊的 **Copy／複製**，貼到 **Codex app 的對話輸入框**並送出，即可要求安裝：
 
 ```text
-$skill-installer 請從 https://github.com/cclintw/textoria-entity-extractor.git 下載並安裝 Skill。
+$skill-installer https://github.com/cclintw/textoria-entity-extractor.git
 ```
 
 `SKILL.md` 位於 repository 根目錄。安裝資料夾名稱為 `textoria-entity-extractor`，須完整保留 `SKILL.md` 與 `scripts/` 的相對位置。
