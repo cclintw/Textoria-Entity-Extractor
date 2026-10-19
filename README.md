@@ -39,7 +39,7 @@ $skill-installer --repo cclintw/textoria-entity-extractor --path . --name textor
 ## Use in the Codex app
 
 
-<img src="assets/demo.webp" style="border-radius:16px;" alt="操作示範" width="900">
+<img src="assets/demo-round.webp" alt="textoria-entity-extractor" width="800">
 
 Open a local project, upload a text file, and say:
 
