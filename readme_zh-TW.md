@@ -18,7 +18,7 @@
 
 **使用 ChatGPT 時，改用下方提示詞**：複製貼上提示詞，再提供要提取的文本即可，建議先用短文。提取內容可能不如 Codex app 完整，請對照原文檢查。
 
-<img src="assets/demo.webp" styoe="border-radius:16px;" alt="操作示範" width="900">
+<img src="assets/demo.webp" style="border-radius:16px;" alt="操作示範" width="900">
 
 ## 在 Codex app 安裝
 
