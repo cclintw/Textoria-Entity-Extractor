@@ -380,7 +380,9 @@ def cmd_export(a):
                     'alias_separator':None if a.no_alias else '|','alias_semantics':'source_context_not_global_identity',
                     'deduplication_key':['name','type']})
     save(root/'exports.json',history)
-    print(f"Exported {entry['output']}")
+    output=Path(entry['output'])
+    label=output.name.replace('\\','\\\\').replace('[','\\[').replace(']','\\]')
+    print(f'[{label}](<{output}>)')
 
 def cmd_status(a):
     root=Path(a.work);ps=load(root/'paragraphs.json',[]);reg=load(root/'registry.json',[])
