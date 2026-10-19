@@ -6,7 +6,6 @@ One of the essential resources for text annotation is a reference vocabulary. Al
 
 This Codex Skill addresses that problem through incremental entity extraction. The basic idea is simple: first extract named entities from the full text to build an entity list, then use that list as a reference vocabulary for subsequent annotation. Before working with text annotation platforms such as MARKUS or DocuSky, users can use this Skill to automatically extract people, places, official positions, organizations, and other entities into a CSV reference vocabulary. The vocabulary can then be imported into platforms that support the corresponding format, reducing the time spent manually compiling vocabularies and repeatedly annotating the same names.
 
-This project grew out of problems encountered when using AI to annotate long texts directly: missed entities, inconsistent interpretation of identical names, and outputs too long to review easily. Textoria therefore separates building an entity list from annotating the text, allowing users to review and organize names before reusing the list in annotation tools.
 
 Results use the `name,type,alias` CSV format for review in a spreadsheet or adaptation for tools such as MARKUS.
 
