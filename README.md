@@ -2,9 +2,11 @@
 
 [繁體中文](readme_zh-TW.md) · [ChatGPT short-text prompt](prompt.md) · [Codex Skill](SKILL.md) · [GNU GPL v3](LICENSE)
 
-Textoria Entity Extractor uses AI to extract **names, types, and aliases** from texts and web pages, producing a reusable CSV reference list for text annotation. It covers people, places, organizations, works, and other entity types.
+One of the essential resources for text annotation is a reference vocabulary. Although APIs and MCP can provide access to external authority lists, suitable resources are not available for every type of text. Researchers often still need to build a reference vocabulary tailored to their source material. Compiling such a vocabulary manually, however, is tedious and one of the most time-consuming parts of text annotation.
 
-The project grew out of the difficulties of using AI to annotate long texts directly: names can be missed, recurring names can receive inconsistent treatment, and long outputs can be difficult to review. Textoria separates building an entity list from annotating the text, so you can review and reuse the list with annotation tools.
+This Codex Skill addresses that problem through incremental entity extraction. The basic idea is simple: first extract named entities from the full text to build an entity list, then use that list as a reference vocabulary for subsequent annotation. Before working with text annotation platforms such as MARKUS or DocuSky, users can use this Skill to automatically extract people, places, official positions, organizations, and other entities into a CSV reference vocabulary. The vocabulary can then be imported into platforms that support the corresponding format, reducing the time spent manually compiling vocabularies and repeatedly annotating the same names.
+
+This project grew out of problems encountered when using AI to annotate long texts directly: missed entities, inconsistent interpretation of identical names, and outputs too long to review easily. Textoria therefore separates building an entity list from annotating the text, allowing users to review and organize names before reusing the list in annotation tools.
 
 Results use the `name,type,alias` CSV format for review in a spreadsheet or adaptation for tools such as MARKUS.
 
