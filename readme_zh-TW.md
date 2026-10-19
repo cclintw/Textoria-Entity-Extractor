@@ -1,4 +1,4 @@
-# Textoria 文本實體提取工具
+# Textoria Entity Extractor 文本實體提取工具
 
 [English](README.md) · [ChatGPT 短文本提示詞](prompt.md) · [Codex Skill](SKILL.md) · [GPL v3 授權](LICENSE)
 
