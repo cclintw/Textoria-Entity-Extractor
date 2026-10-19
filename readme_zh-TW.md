@@ -18,8 +18,6 @@
 
 **使用 ChatGPT 時，改用下方提示詞**：複製貼上提示詞，再提供要提取的文本即可，建議先用短文。提取內容可能不如 Codex app 完整，請對照原文檢查。
 
-<img src="assets/demo.webp" style="border-radius:16px;" alt="操作示範" width="900">
-
 ## 在 Codex app 安裝
 
 ### 方法一：貼上安裝指令
@@ -37,6 +35,9 @@ $skill-installer --repo cclintw/textoria-entity-extractor --path . --name textor
 3. 將資料夾放入 `<專案>/textoria-entity-extractor/` 即可，接著依下方使用方式操作，不必另執行設定命令。
 
 ## Codex app 使用方式
+
+
+<img src="assets/demo.webp" style="border-radius:16px;" alt="操作示範" width="900">
 
 開啟本機工作專案，上傳文本，然後說：
 

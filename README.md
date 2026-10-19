@@ -19,8 +19,6 @@ For a detailed project overview, please refer to: [textoria-incremental-entity-e
 **In ChatGPT, use the prompt below instead.** Paste the prompt, then provide your source text; start with a short passage. Extraction may be less complete than in the Codex app, so check the result against the source.
 
 
-<img src="assets/demo.webp" style="border-radius:16px;" alt="操作示範" width="900">
-
 ## Install in the Codex app
 
 ### Option 1: Paste the installation command
@@ -39,6 +37,9 @@ $skill-installer --repo cclintw/textoria-entity-extractor --path . --name textor
 3. Put the folder at `<your-project>/textoria-entity-extractor/`. No additional setup commands are required for the workflow below.
 
 ## Use in the Codex app
+
+
+<img src="assets/demo.webp" style="border-radius:16px;" alt="操作示範" width="900">
 
 Open a local project, upload a text file, and say:
 
