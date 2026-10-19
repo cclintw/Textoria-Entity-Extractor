@@ -37,7 +37,7 @@ $skill-installer --repo cclintw/textoria-entity-extractor --path . --name textor
 ## Codex app 使用方式
 
 
-<img src="assets/demo-round.webp" alt="textoria-entity-extractor" width="800">
+<img src="assets/demo-rounde.webp" alt="textoria-entity-extractor" width="800">
 
 開啟本機工作專案，上傳文本，然後說：
 
