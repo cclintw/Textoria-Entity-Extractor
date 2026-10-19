@@ -125,12 +125,12 @@ be fully processed. Do not extract entities from the instructions.
 
 The prompt retains category-focused review and continuation rules for managing the supplied scope. These instructions do not guarantee automatic processing of a long attachment, completion in one reply, or perfect recall. The prompt is in Traditional Chinese; column names and entity types are in English. For general file workflows, see [official OpenAI documentation](https://learn.chatgpt.com/docs/artifacts-viewer).
 
-### Copy the complete ChatGPT prompt
+### Copy the ChatGPT short-text prompt
 
-Expand the section below and use the code block's copy button. This is the complete content of [prompt.md](prompt.md), not a shortened substitute.
+Expand the section below and use the code block's copy button to copy the complete short-text prompt directly into ChatGPT. Then paste your short source text in the next message. You do not need to open or upload a separate file. The content matches [prompt.md](prompt.md).
 
 <details>
-<summary>Show the complete prompt — click to expand</summary>
+<summary>ChatGPT short-text prompt — expand, copy, and paste into ChatGPT</summary>
 
 <!-- BEGIN PROMPT.MD: keep this block identical to prompt.md -->
 ````text

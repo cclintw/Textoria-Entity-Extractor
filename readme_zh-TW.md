@@ -123,12 +123,12 @@ GitHub 專案名稱、安裝資料夾名稱與呼叫名稱統一為 `textoria-en
 
 提示詞保留分類複查與中斷續作規則，用於管理已提供的範圍；這些指令不保證自動處理長篇附件、單次回覆完成或完全無遺漏。一般檔案工作流程可參考 [OpenAI 官方說明](https://learn.chatgpt.com/docs/artifacts-viewer)。
 
-### 一鍵複製完整 ChatGPT 提示詞
+### 一鍵複製 ChatGPT 短文本提示詞
 
-展開下方區塊，點選程式碼區塊右上角的複製按鈕，即可把完整內容貼到 ChatGPT。內容與 [prompt.md](prompt.md) 相同，不是節錄版。
+展開下方區塊，點選程式碼區塊右上角的複製按鈕，將完整的短文本提示詞貼到 ChatGPT，再於下一則訊息貼上要提取的短文本即可。不必另外開啟或上傳檔案。內容與 [prompt.md](prompt.md) 完全相同。
 
 <details>
-<summary>展開完整提示詞</summary>
+<summary>ChatGPT 短文本提示詞：點此展開，複製後直接貼上 ChatGPT</summary>
 
 <!-- BEGIN PROMPT.MD: keep this block identical to prompt.md -->
 ````text
