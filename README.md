@@ -18,6 +18,9 @@ For a detailed project overview, please refer to: [textoria-incremental-entity-e
 
 **In ChatGPT, use the prompt below instead.** Paste the prompt, then provide your source text; start with a short passage. Extraction may be less complete than in the Codex app, so check the result against the source.
 
+
+<img src="assets/demo.webp" styoe="border-radius:16px;" alt="操作示範" width="900">
+
 ## Install in the Codex app
 
 ### Option 1: Paste the installation command
