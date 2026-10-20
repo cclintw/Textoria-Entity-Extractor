@@ -37,7 +37,9 @@ Skill 名稱為 `textoria-entity-extractor`。來源副本與 CSV 統一存放�
 ## Codex app 使用方式
 
 
-<img src="assets/demo-rounde.webp" alt="textoria-entity-extractor" width="800">
+<a href="assets/demo-rounde.webp"><img src="assets/demo-preview.webp" alt="Textoria 文本實體提取工具：實體清單 CSV 預覽" width="800"></a>
+
+[點此觀看操作動畫](assets/demo-rounde.webp)。
 
 開啟本機工作專案，上傳文本，然後說：
 

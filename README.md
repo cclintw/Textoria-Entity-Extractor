@@ -40,7 +40,9 @@ The Skill is named `textoria-entity-extractor`. Source copies and CSVs are store
 ## Use in the Codex app
 
 
-<img src="assets/demo-rounde.webp" alt="textoria-entity-extractor" width="800">
+<a href="assets/demo-rounde.webp"><img src="assets/demo-preview.webp" alt="Textoria Entity Extractor: extracted entities in a CSV preview" width="800"></a>
+
+[Watch the animated demo](assets/demo-rounde.webp).
 
 Open a local project, upload a text file, and say:
 
