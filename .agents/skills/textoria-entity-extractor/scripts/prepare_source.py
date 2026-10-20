@@ -6,6 +6,7 @@ from html.parser import HTMLParser
 import json
 from pathlib import Path
 import re
+import tempfile
 from urllib.parse import urlsplit, unquote
 from urllib.request import Request, urlopen
 
@@ -156,7 +157,7 @@ def main():
     source = parser.add_mutually_exclusive_group(required=True)
     source.add_argument('--input', help='Local .txt, .md, .html or .htm file')
     source.add_argument('--url', help='Single public HTTP(S) page; no recursive crawling')
-    parser.add_argument('--project', required=True, help='User project root, not Skill installation')
+    parser.add_argument('--project', required=True, help='User project root; data is stored under its textoria-entity-extractor/ subdirectory')
     parser.add_argument('--encoding', help='Explicit source encoding when not UTF-8')
     parser.add_argument('--region', choices=['auto', 'main', 'article', 'body', 'all'], default='auto')
     a = parser.parse_args()
@@ -188,9 +189,9 @@ def main():
         data = src.read_bytes()
         is_html = src.suffix.lower() in {'.html', '.htm'}
     # Archive the source before decoding/cleaning; retain it even if parsing fails.
-    project = Path(a.project).resolve()
+    project = Path(a.project).resolve() / 'textoria-entity-extractor'
     source_dir = project / 'source'
-    for directory in (source_dir, project / 'csv', project / '.textoria-entities'):
+    for directory in (source_dir, project / 'csv'):
         directory.mkdir(parents=True, exist_ok=True)
     stem = Path(filename).stem
     raw_suffix = '.html' if is_html else ('.md' if Path(filename).suffix.lower() == '.md' else '.txt')
@@ -214,7 +215,8 @@ def main():
     prepared = (write_unique(source_dir, original.stem + '.clean', '.txt', text.encode('utf-8'))
                 if is_html or encoding or data != text.encode('utf-8') else original)
     manifest = {**source_identity(input_path=a.input,url=a.url,label=stem),
-                'pipeline_profile':'entity-reference-v5-source-csv-rotation',
+                'pipeline_profile':'entity-reference-v6-temporary-work',
+                'temporary_work': True, 'output_dir': str(project / 'csv'),
                 'original': str(original), 'input': str(prepared),
                 'requested_url': a.url, 'final_url': source_url,
                 'local_source': str(Path(a.input).resolve()) if a.input else None,
@@ -224,10 +226,8 @@ def main():
                 'heading_hints':html.heading_hints if is_html else [],
                 'warnings': ['HTML selection and whitespace cleanup require Agent inspection; '
                              'existing annotations are unverified hints.'] if is_html else []}
-    # Include source identity, selected region and text version; never overwrite other provenance.
-    key = digest(json.dumps(manifest, ensure_ascii=False, sort_keys=True).encode())[:12]
-    work = project / '.textoria-entities' / f'{original.stem}-{key}'
-    work.mkdir(exist_ok=True)
+    # Each invocation has isolated temporary work; keep its returned path for retries.
+    work = Path(tempfile.mkdtemp(prefix='textoria-entity-extractor-work-')).resolve()
     manifest_path = work / 'source.json'
     manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     print(json.dumps({'input': str(prepared), 'work': str(work), 'manifest': str(manifest_path),

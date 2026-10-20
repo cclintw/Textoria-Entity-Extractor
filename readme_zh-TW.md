@@ -1,6 +1,6 @@
 # Textoria Entity Extractor 文本實體提取工具
 
-[English](README.md) · [ChatGPT 短文本提示詞](prompt.md) · [Codex Skill](SKILL.md) · [GPL v3 授權](LICENSE)
+[English](README.md) · [ChatGPT 短文本提示詞](prompt.md) · [Codex Skill](.agents/skills/textoria-entity-extractor/SKILL.md) · [GPL v3 授權](LICENSE)
 
 文本標註最需要的基礎資源之一，就是標註參考詞表。雖然我們可以透過 API 或 MCP 取得外部權威詞表，但並非所有文本類型都能找到合適的參考資源。最終往往仍須依據文本內容，自行建立專屬的標註參考詞表。但是人工整理詞表不僅繁瑣，也是文本標註過程中最耗時的工作之一。
 
@@ -12,7 +12,7 @@
 
 ## 選擇使用方式
 
-**建議使用 Codex app**：安裝本專案的 Skill 後，上傳文本或提供網址，即可提取實體並將 CSV 儲存在專案中，處理進度也會保存，方便繼續。
+**建議使用 Codex app**：安裝本專案的 Skill 後，上傳文本或提供網址，即可提取實體並將 CSV 儲存在專案中，工作資料只放系統暫存目錄，成功匯出後清除。
 
 **使用 ChatGPT 時，改用下方提示詞**：複製貼上提示詞，再提供要提取的文本即可，建議先用短文。提取內容可能不如 Codex app 完整，請對照原文檢查。
 
@@ -23,14 +23,16 @@
 在 Codex app 開啟專案，貼上下方指令並送出：
 
 ```text
-$skill-installer --repo cclintw/textoria-entity-extractor --path . --name textoria-entity-extractor --dest .
+$skill-installer --repo cclintw/textoria-entity-extractor --path .agents/skills/textoria-entity-extractor --dest .agents/skills
 ```
 
 ### 方法二：手動下載安裝
 
 1. 開啟 [GitHub 專案頁面](https://github.com/cclintw/textoria-entity-extractor)，選擇 **Code → Download ZIP**。
-2. 解壓縮，將解壓縮後的資料夾命名為 `textoria-entity-extractor`，完整保留所有 repository 檔案及其相對位置。
-3. 將資料夾放入 `<專案>/textoria-entity-extractor/` 即可，接著依下方使用方式操作，不必另執行設定命令。
+2. 解壓縮，找到 `.agents/skills/textoria-entity-extractor/`；必要時開啟顯示隱藏檔案。
+3. 將這個完整的 Skill 資料夾複製到 `<專案>/.agents/skills/`，保留內部檔案。入口檔案應為 `<專案>/.agents/skills/textoria-entity-extractor/SKILL.md`。
+
+Skill 名稱為 `textoria-entity-extractor`。來源副本與 CSV 統一存放在 `<專案>/textoria-entity-extractor/`，第一次提取時才建立。GitHub repository 名稱仍為 `textoria-entity-extractor`。
 
 ## Codex app 使用方式
 
@@ -49,7 +51,7 @@ $skill-installer --repo cclintw/textoria-entity-extractor --path . --name textor
 請從 https://example.org/article 提取實體清單。
 ```
 
-成果會自動儲存在工作專案的 `csv/` 資料夾，欄位為 `name,type,alias`，不需要另行下載。若來源或存放位置不明確，Codex 會再詢問。
+成果會自動儲存在工作專案的 `textoria-entity-extractor/csv/` 資料夾，欄位為 `name,type,alias`，不需要另行下載。若來源或存放位置不明確，Codex 會再詢問。
 
 ## ChatGPT 使用方式
 
@@ -150,18 +152,18 @@ name,type,alias
 
 ## 處理流程
 
-Codex 逐段閱讀文本、累積實體清單，再核對原文、去除重複並匯出 CSV。處理進度會保存，方便中斷後繼續。
+Codex 逐段閱讀文本、累積實體清單，再核對原文、去除重複並匯出 CSV。處理期間使用系統暫存目錄，成功匯出後清除；中斷後僅在暫存仍存在時可續跑。
 
 ## 成果檔案
 
-CSV 儲存在專案的 `csv/` 資料夾，以來源名稱加上匯出時間命名。同一來源保留最近三份成果。
+CSV 儲存在專案的 `textoria-entity-extractor/csv/` 資料夾，以來源名稱、來源識別碼與匯出時間命名。同一來源保留最近三份成果。
 
 ## 專案檔案
 
 | 檔案 | 用途 |
 |---|---|
-| [SKILL.md](SKILL.md) | Codex 工作流程與提取規則 |
-| [scripts/](scripts/) | Skill 使用的輔助程式 |
+| [.agents/skills/textoria-entity-extractor/SKILL.md](.agents/skills/textoria-entity-extractor/SKILL.md) | Codex 工作流程與提取規則 |
+| [.agents/skills/textoria-entity-extractor/scripts/](.agents/skills/textoria-entity-extractor/scripts/) | Skill 使用的輔助程式 |
 | [prompt.md](prompt.md) | ChatGPT 短文本提示詞 |
 | [README.md](README.md) | 英文說明 |
 | [CITATION.cff](CITATION.cff) | 軟體引用資料 |

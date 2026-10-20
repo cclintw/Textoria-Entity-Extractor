@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Textoria incremental entity reference inventory; standard-library only."""
-import argparse,csv,json,re,hashlib,unicodedata,os,tempfile,io
+import argparse,csv,json,re,hashlib,unicodedata,os,tempfile,io,shutil
 from pathlib import Path
 from datetime import datetime,timedelta,timezone
 from zoneinfo import ZoneInfo
@@ -64,97 +64,39 @@ def atomic_bytes(path,data):
 def timestamped_path(folder,source_id,stamp):
     return folder/f"{source_id}-{stamp.strftime('%Y%m%d-%H%M%S-%f')}.csv"
 
-def export_text_id(source,sources):
-    """Use the source filename stem; disambiguate same-name sources in this project."""
-    label=source['source_label']
-    reserved={unicodedata.normalize('NFC',s.get('text_id',s['source_id'])).casefold()
-              for s in sources.values() if s['source_id']!=source['source_id']}
-    candidate=label
-    if unicodedata.normalize('NFC',candidate).casefold() in reserved:
-        candidate=f"{label}-{source['source_id']}"
-    while unicodedata.normalize('NFC',candidate).casefold() in reserved:
-        candidate+='_'+source['source_id']
-    return candidate
-
-def commit_versions(index_path,index,folder,cleanup):
-    # Remember cleanup until it succeeds, so interruptions cannot orphan expired versions.
-    paths=list(dict.fromkeys([*index.get('pending_deletions',[]),*(str(p) for p in cleanup)]))
-    if any(Path(p).resolve().parent!=folder for p in paths):raise ValueError('Refusing to delete a version outside csv/')
-    index['pending_deletions']=paths
-    atomic_bytes(index_path,(json.dumps(index,ensure_ascii=False,indent=2)+'\n').encode('utf-8'))
-    for value in paths:
-        path=Path(value)
-        if path.exists():path.unlink()
-    index.pop('pending_deletions')
-    atomic_bytes(index_path,(json.dumps(index,ensure_ascii=False,indent=2)+'\n').encode('utf-8'))
-
-def migrate_slot_state(folder,state):
-    """Rename legacy slot files by their actual export times; never by slot number."""
-    if 'slots' not in state:return []
-    versions=[];cleanup=[]
-    for entry in sorted(state['slots'].values(),key=lambda e:e['generation']):
-        old=Path(entry['output']).resolve()
-        if old.parent!=folder:raise ValueError('Legacy CSV outside expected directory')
-        if not old.exists():continue
-        data=old.read_bytes();stamp=datetime.fromisoformat(entry['exported_at'])
-        if stamp.tzinfo is None:stamp=stamp.replace(tzinfo=timezone.utc)
-        output=timestamped_path(folder,state['source_id'],stamp)
-        while output.exists() and output.read_bytes()!=data:
-            stamp+=timedelta(microseconds=1);output=timestamped_path(folder,state['source_id'],stamp)
-        if not output.exists():atomic_bytes(output,data)
-        updated={k:v for k,v in entry.items() if k!='slot'}
-        updated.update(output=str(output),filename_at=stamp.isoformat(),previous_slot_output=str(old))
-        versions.append(updated);cleanup.append(old)
-    state['versions']=versions
-    state.pop('slots')
-    if versions:state['last_filename_at']=max(versions,key=lambda e:datetime.fromisoformat(e['filename_at']))['filename_at']
-    return cleanup
-
-def migrate_csv_versions(folder):
-    folder=Path(folder).resolve();root=folder.parent/'.textoria-entities'
-    with csv_version_lock(root):
-        index_path=root/'csv-versions.json';index=load(index_path,{'version':2,'sources':{}})
-        cleanup=[]
-        for state in index['sources'].values():cleanup.extend(migrate_slot_state(folder,state))
-        index['version']=2
-        commit_versions(index_path,index,folder,cleanup)
-
 def rotate_csv(folder,source,data,exported_at,work,columns):
-    """Create a dated CSV, then remove the oldest export beyond three per source."""
+    """Retain three exports per source using filenames, without a project index."""
     folder=Path(folder).resolve()
     if folder.name!='csv':raise ValueError('Export directory must be the project csv/ folder')
     folder.mkdir(parents=True,exist_ok=True)
-    root=folder.parent/'.textoria-entities'
-    with csv_version_lock(root):
-        index_path=root/'csv-versions.json'
-        index=load(index_path,{'version':2,'sources':{}})
-        state=index['sources'].setdefault(source['source_id'],{
-            **source,'total_exports':0,'versions':[]})
-        if state['source_key']!=source['source_key']:raise ValueError('Source identifier collision')
-        cleanup=migrate_slot_state(folder,state)
-        # Keep retention keyed by source_id, including exports with legacy hash filenames.
-        if not state.get('text_id'):state['text_id']=export_text_id(source,index['sources'])
-        generation=state['total_exports']+1
+    lock_id=hashlib.sha256(str(folder).encode()).hexdigest()
+    lock_root=Path(tempfile.gettempdir())/('textoria-csv-lock-'+lock_id)
+    with csv_version_lock(lock_root):
         stamp=datetime.fromisoformat(exported_at)
-        if stamp.tzinfo is None:stamp=stamp.replace(tzinfo=timezone.utc)
-        if state.get('last_filename_at'):
-            last=datetime.fromisoformat(state['last_filename_at'])
-            stamp=stamp.astimezone(last.tzinfo)
-            if stamp<=last:stamp=last+timedelta(microseconds=1)
-        output=timestamped_path(folder,state['text_id'],stamp)
+        text_id=source['source_label']+'-'+source['source_id']
+        output=timestamped_path(folder,text_id,stamp)
         while output.exists():
-            stamp+=timedelta(microseconds=1);output=timestamped_path(folder,state['text_id'],stamp)
+            stamp+=timedelta(microseconds=1);output=timestamped_path(folder,text_id,stamp)
         atomic_bytes(output,data)
-        entry={'output':str(output),'exported_at':exported_at,'work':str(Path(work).resolve()),
-               'generation':generation,'filename_at':stamp.isoformat(),'columns':columns,'source_id':source['source_id'],'text_id':state['text_id'],
-               'alias_semantics':'source_context_not_global_identity'}
-        state['total_exports']=generation
-        state['last_filename_at']=stamp.isoformat()
-        versions=sorted([*state['versions'],entry],key=lambda e:e['generation'])
-        removed=versions[:-3];state['versions']=versions[-3:]
-        index['version']=2
-        commit_versions(index_path,index,folder,[*cleanup,*(Path(e['output']).resolve() for e in removed)])
-        return entry
+        # Verify the durable result before deleting any old export or temporary work.
+        if output.read_bytes()!=data:raise ValueError('CSV verification failed; work retained')
+        pattern=re.compile(r'(?:.+-)?'+re.escape(source['source_id'])+r'-\d{8}-\d{6}-\d{6}\.csv')
+        versions=[p for p in folder.iterdir() if p.is_file() and not p.is_symlink()
+                  and pattern.fullmatch(p.name) and p!=output]
+        versions.sort(key=lambda p:(p.stat().st_mtime_ns,p.name))
+        for expired in versions[:-2]:expired.unlink()
+        return {'output':str(output),'exported_at':exported_at,'columns':columns,
+                'source_id':source['source_id'],'text_id':text_id}
+
+def cleanup_work(work):
+    """Only remove a work directory created by prepare_source in system temp."""
+    work=Path(work).resolve()
+    manifest=load(work/'source.json',{})
+    if not manifest.get('temporary_work'):return
+    if (work.parent!=Path(tempfile.gettempdir()).resolve()
+            or not work.name.startswith('textoria-entity-extractor-work-')):
+        raise ValueError('Refusing to remove work outside the managed temporary directory')
+    shutil.rmtree(work)
 
 def chunks(text,max_chars=300,overlap=40):
     """Yield exact source slices, with punctuation-aware boundaries and overlap."""
@@ -374,13 +316,8 @@ def cmd_export(a):
     writer=csv.writer(buffer);writer.writerow(columns)
     writer.writerows(row[:2] if a.no_alias else row for row in rows)
     entry=rotate_csv(a.output_dir,work_source(root),buffer.getvalue().encode('utf-8-sig'),now.isoformat(),root,columns)
-    history=load(root/'exports.json',[])
-    history.append({**entry,'timezone':a.timezone or str(now.tzinfo),
-                    'rows':len(rows),'reviewed_only':a.reviewed_only,
-                    'alias_separator':None if a.no_alias else '|','alias_semantics':'source_context_not_global_identity',
-                    'deduplication_key':['name','type']})
-    save(root/'exports.json',history)
     output=Path(entry['output'])
+    cleanup_work(root)
     label=output.name.replace('\\','\\\\').replace('[','\\[').replace(']','\\]')
     print(f'[{label}](<{output}>)')
 

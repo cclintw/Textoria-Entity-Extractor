@@ -1,6 +1,6 @@
 # Textoria Entity Extractor
 
-[繁體中文](readme_zh-TW.md) · [ChatGPT short-text prompt](prompt.md) · [Codex Skill](SKILL.md) · [GNU GPL v3](LICENSE)
+[繁體中文](readme_zh-TW.md) · [ChatGPT short-text prompt](prompt.md) · [Codex Skill](.agents/skills/textoria-entity-extractor/SKILL.md) · [GNU GPL v3](LICENSE)
 
 One of the essential resources for text annotation is a reference vocabulary. Although APIs and MCP can provide access to external authority lists, suitable resources are not available for every type of text. Researchers often still need to build a reference vocabulary tailored to their source material. Compiling such a vocabulary manually, however, is tedious and one of the most time-consuming parts of text annotation.
 
@@ -13,7 +13,7 @@ For a detailed project overview, please refer to: [textoria-incremental-entity-e
 
 ## Choose your workflow
 
-**Use the Codex app for the recommended workflow.** Install this project's Skill, then upload your text or provide a URL. Results are saved as a CSV in your project, along with progress so you can continue later.
+**Use the Codex app for the recommended workflow.** Install this project's Skill, then upload your text or provide a URL. Results are saved as a CSV in your project. Processing uses system temporary storage, which is cleared after a successful export.
 
 **In ChatGPT, use the prompt below instead.** Paste the prompt, then provide your source text; start with a short passage. Extraction may be less complete than in the Codex app, so check the result against the source.
 
@@ -25,15 +25,17 @@ For a detailed project overview, please refer to: [textoria-incremental-entity-e
 Open your project in the Codex app, paste the following command into the chat, and send it:
 
 ```text
-$skill-installer --repo cclintw/textoria-entity-extractor --path . --name textoria-entity-extractor --dest .
+$skill-installer --repo cclintw/textoria-entity-extractor --path .agents/skills/textoria-entity-extractor --dest .agents/skills
 ```
 
 
 ### Option 2: Download and install manually
 
 1. Open [the repository](https://github.com/cclintw/textoria-entity-extractor) and choose **Code → Download ZIP**.
-2. Extract it and name the extracted folder `textoria-entity-extractor`. Keep all repository files and their relative paths unchanged.
-3. Put the folder at `<your-project>/textoria-entity-extractor/`. No additional setup commands are required for the workflow below.
+2. Extract it and locate `.agents/skills/textoria-entity-extractor/` (enable hidden files if needed).
+3. Copy that entire Skill folder into `<your-project>/.agents/skills/`, preserving its contents. The resulting entrypoint is `<your-project>/.agents/skills/textoria-entity-extractor/SKILL.md`.
+
+The Skill is named `textoria-entity-extractor`. Source copies and CSVs are stored under `<your-project>/textoria-entity-extractor/`, created on first extraction. The repository name remains `textoria-entity-extractor`.
 
 ## Use in the Codex app
 
@@ -52,7 +54,7 @@ You can also provide a local file path or a web page URL:
 Extract an entity list from https://example.org/article
 ```
 
-The CSV is automatically saved in the project's `csv/` folder with `name,type,alias` columns. No separate download is needed. If the source or save location is unclear, Codex asks you to clarify.
+The CSV is automatically saved in the project's `textoria-entity-extractor/csv/` folder with `name,type,alias` columns. No separate download is needed. If the source or save location is unclear, Codex asks you to clarify.
 
 ## Use in ChatGPT
 
@@ -153,18 +155,18 @@ Supported types:
 
 ## How processing works
 
-Codex reads the text section by section, builds an entity list, checks it against the source, removes duplicates, and exports a CSV. Progress is saved so you can continue after an interruption.
+Codex reads the text section by section, builds an entity list, checks it against the source, removes duplicates, and exports a CSV. Work is kept in system temporary storage during processing and removed after a successful export. Interrupted runs can resume while their temporary work still exists.
 
 ## Output files
 
-CSVs are saved in the project's `csv/` folder and named after the source and export time. The three most recent results are kept for each source.
+CSVs are saved in the project's `textoria-entity-extractor/csv/` folder and named after the source, its identifier, and export time. The three most recent results are kept for each source.
 
 ## Repository contents
 
 | File | Purpose |
 |---|---|
-| [SKILL.md](SKILL.md) | Codex workflow and extraction rules |
-| [scripts/](scripts/) | Supporting programs used by the Skill |
+| [.agents/skills/textoria-entity-extractor/SKILL.md](.agents/skills/textoria-entity-extractor/SKILL.md) | Codex workflow and extraction rules |
+| [.agents/skills/textoria-entity-extractor/scripts/](.agents/skills/textoria-entity-extractor/scripts/) | Supporting programs used by the Skill |
 | [prompt.md](prompt.md) | ChatGPT short-text prompt |
 | [readme_zh-TW.md](readme_zh-TW.md) | Traditional Chinese documentation |
 | [CITATION.cff](CITATION.cff) | Software citation metadata |
