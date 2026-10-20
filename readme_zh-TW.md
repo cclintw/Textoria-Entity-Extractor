@@ -1,6 +1,6 @@
 # Textoria Entity Extractor 文本實體提取工具
 
-[English](README.md) · [ChatGPT 短文本提示詞](prompt.md) · [Codex Skill](.agents/skills/textoria-entity-extractor/SKILL.md) · [GPL v3 授權](LICENSE)
+[English](README.md) · [ChatGPT 短文本提示詞](prompt.md) · [Codex Skill](.agents/skills/textoria-entity-extractor/SKILL.md) · [GPL v3 或後續版本授權](LICENSE)
 
 文本標註最需要的基礎資源之一，就是標註參考詞表。雖然我們可以透過 API 或 MCP 取得外部權威詞表，但並非所有文本類型都能找到合適的參考資源。最終往往仍須依據文本內容，自行建立專屬的標註參考詞表。但是人工整理詞表不僅繁瑣，也是文本標註過程中最耗時的工作之一。
 
@@ -167,7 +167,7 @@ CSV 儲存在專案的 `textoria-entity-extractor/csv/` 資料夾，以來源名
 | [prompt.md](prompt.md) | ChatGPT 短文本提示詞 |
 | [README.md](README.md) | 英文說明 |
 | [CITATION.cff](CITATION.cff) | 軟體引用資料 |
-| [LICENSE](LICENSE) | GPL v3 授權條款 |
+| [LICENSE](LICENSE) | GPL v3 或後續版本授權條款 |
 
 ## 作者與引用
 
@@ -195,7 +195,7 @@ Chance Chun-Cheng Lin。Textoria 文本實體提取工具：用於命名實體�
 
 ## 授權
 
-本專案採用 [GNU GPL 第 3 版，僅限此版本](LICENSE)（`GPL-3.0-only`），Copyright © 2026 Chance Chun-Cheng Lin。允許使用、修改、散布及商業販售。散布原版或修改版時，須保留必要的著作權、授權與免責聲明，標示修改，並依 GPL v3 規定以該授權提供對應原始碼。
+本專案採用 [GNU GPL 第 3 版或任何後續版本](LICENSE)（`GPL-3.0-or-later`），Copyright © 2026 Chance Chun-Cheng Lin。允許使用、修改、散布及商業販售。散布原版或修改版時，須保留必要的著作權、授權與免責聲明，標示修改，並依所選 GPL 版本規定以該授權提供對應原始碼。
 
 ## 支持專案
 

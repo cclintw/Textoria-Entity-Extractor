@@ -1,6 +1,6 @@
 # Textoria Entity Extractor
 
-[繁體中文](readme_zh-TW.md) · [ChatGPT short-text prompt](prompt.md) · [Codex Skill](.agents/skills/textoria-entity-extractor/SKILL.md) · [GNU GPL v3](LICENSE)
+[繁體中文](readme_zh-TW.md) · [ChatGPT short-text prompt](prompt.md) · [Codex Skill](.agents/skills/textoria-entity-extractor/SKILL.md) · [GNU GPL v3 or later](LICENSE)
 
 One of the essential resources for text annotation is a reference vocabulary. Although APIs and MCP can provide access to external authority lists, suitable resources are not available for every type of text. Researchers often still need to build a reference vocabulary tailored to their source material. Compiling such a vocabulary manually, however, is tedious and one of the most time-consuming parts of text annotation.
 
@@ -170,7 +170,7 @@ CSVs are saved in the project's `textoria-entity-extractor/csv/` folder and name
 | [prompt.md](prompt.md) | ChatGPT short-text prompt |
 | [readme_zh-TW.md](readme_zh-TW.md) | Traditional Chinese documentation |
 | [CITATION.cff](CITATION.cff) | Software citation metadata |
-| [LICENSE](LICENSE) | GNU GPL v3 |
+| [LICENSE](LICENSE) | GNU GPL v3 or later |
 
 ## Author and citation
 
@@ -192,7 +192,7 @@ This is an independent project, not an official OpenAI product. Source texts and
 
 ## License
 
-Released under the [GNU General Public License, version 3 only](LICENSE) (`GPL-3.0-only`), Copyright © 2026 Chance Chun-Cheng Lin. You may use, modify, and redistribute the project, including commercially. When distributing original or modified versions, preserve the required copyright, license, and warranty notices, mark modifications, and provide corresponding source code under GPL v3 as required by the license.
+Released under the [GNU General Public License, version 3 or any later version](LICENSE) (`GPL-3.0-or-later`), Copyright © 2026 Chance Chun-Cheng Lin. You may use, modify, and redistribute the project, including commercially. When distributing original or modified versions, preserve the required copyright, license, and warranty notices, mark modifications, and provide corresponding source code under the applicable GPL version as required by the license.
 
 ## Support the project
 

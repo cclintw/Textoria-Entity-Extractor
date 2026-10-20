@@ -8,7 +8,7 @@ authors:
     website: "https://github.com/cclintw"
 repository-code: "https://github.com/cclintw/textoria-entity-extractor"
 url: "https://github.com/cclintw/textoria-entity-extractor"
-license: GPL-3.0-only
+license: GPL-3.0-or-later
 abstract: "A Codex skill and standalone ChatGPT prompt for extracting entity-name reference CSV files from texts and web pages."
 keywords:
   - "named entity extraction"
