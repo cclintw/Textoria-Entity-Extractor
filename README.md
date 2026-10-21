@@ -58,6 +58,13 @@ Extract an entity list from https://example.org/article
 
 The CSV is automatically saved in the project's `textoria-entity-extractor/csv/` folder with `name,type,alias` columns. No separate download is needed. If the source or save location is unclear, Codex asks you to clarify.
 
+Textoria CSV is always included. Before extraction, Codex asks whether you also want **MARKUS TXT**, **DocuSky XLSX**, both, or CSV only, unless you have already specified your preference. Extraction runs once; the selected platform files are converted from the completed CSV with Python's standard library, without another LLM extraction pass. You can also ask to convert an existing Textoria CSV later.
+
+- **MARKUS TXT:** UTF-8 with a Tab-separated `tagtype`, `tag`, `id` header and three columns on every data row, including an empty ID field. Paste the data rows (excluding the header) into **Batch Markup**. No trailing blank line is added. Uses built-in MARKUS tags where available and custom tags otherwise; IDs are blank to avoid inventing authority identifiers.
+- **DocuSky XLSX:** an Excel workbook for **ContentTagging / BatchTagging**, with `tagName,tagVal,@Term` columns. People map to `PersonName`, places to `LocName`, and other types to `Udef_<type>`. `@Term` stays blank; aliases remain independent names rather than global replacements.
+
+Additional files are saved beside the CSV as `markus-<CSV-stem>.txt` and `docusky-<CSV-stem>.xlsx`. The CSV remains the editable master. These are vocabulary inputs, not already annotated texts; review the resulting platform annotations. See [conversion rules and commands](.agents/skills/textoria-entity-extractor/references/platform-exports.md).
+
 ## Use in ChatGPT
 
 1. Expand the section below, copy the complete prompt, and paste it into ChatGPT.
@@ -161,7 +168,7 @@ Codex reads the text section by section, builds an entity list, checks it agains
 
 ## Output files
 
-CSVs are saved in the project's `textoria-entity-extractor/csv/` folder and named after the source, its identifier, and export time. The three most recent results are kept for each source.
+CSVs are saved in the project's `textoria-entity-extractor/csv/` folder and named after the source, its identifier, and export time. The three most recent CSVs are kept for each source. Optional platform TXT/XLSX files are retained separately and are not automatically deleted.
 
 ## Repository contents
 

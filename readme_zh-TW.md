@@ -55,6 +55,13 @@ Skill 名稱為 `textoria-entity-extractor`。來源副本與 CSV 統一存放�
 
 成果會自動儲存在工作專案的 `textoria-entity-extractor/csv/` 資料夾，欄位為 `name,type,alias`，不需要另行下載。若來源或存放位置不明確，Codex 會再詢問。
 
+**Textoria CSV 每次都會產生。** 開始提取前，Codex 會詢問：「除了預設的 Textoria CSV，還需要輸出 MARKUS TXT、DocuSky XLSX 嗎？可複選，也可以只保留 CSV。」已指定格式時不會重問。全文只提取一次，選定的平台檔由完成的 CSV 透過 Python 標準函式庫轉換，不再呼叫 LLM 重新提取；日後也可直接要求轉換既有 Textoria CSV。
+
+- **MARKUS TXT**：UTF-8，第一列為以 Tab 分隔的 `tagtype`、`tag`、`id` 表頭；資料列固定三欄，ID 無內容時保留空欄。不加結尾空白列，貼入「批量標記／Batch Markup」時只複製第二列起的資料。優先對應 MARKUS 內建標籤，其餘為自訂標籤；ID 留空，不捏造權威編號。
+- **DocuSky XLSX**：供「文本批次標記／ContentTagging」工具讀取的 Excel，欄位為 `tagName,tagVal,@Term`。人名對應 `PersonName`、地名對應 `LocName`，其他類型對應 `Udef_<type>`。`@Term` 留空，別名保留為獨立名稱，不自動統一為全稱。
+
+附加檔與 CSV 存在同一資料夾，檔名為 `markus-<CSV原檔名去副檔名>.txt`、`docusky-<CSV原檔名去副檔名>.xlsx`。CSV 仍是可供檢查修改的主檔。平台檔是標記用詞表，匯入後仍須檢視標記結果。詳見 [轉檔規則與指令](.agents/skills/textoria-entity-extractor/references/platform-exports.md)。
+
 ## ChatGPT 使用方式
 
 1. 展開下方區塊，複製完整提示詞並貼到 ChatGPT。
@@ -158,7 +165,7 @@ Codex 逐段閱讀文本、累積實體清單，再核對原文、去除重複�
 
 ## 成果檔案
 
-CSV 儲存在專案的 `textoria-entity-extractor/csv/` 資料夾，以來源名稱、來源識別碼與匯出時間命名。同一來源保留最近三份成果。
+CSV 儲存在專案的 `textoria-entity-extractor/csv/` 資料夾，以來源名稱、來源識別碼與匯出時間命名。同一來源保留最近三份 CSV。附加的平台 TXT／XLSX 獨立保留，不會自動刪除。
 
 ## 專案檔案
 
