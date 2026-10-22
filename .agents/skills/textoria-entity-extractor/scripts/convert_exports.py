@@ -18,9 +18,12 @@ DOCUSKY_TYPES = {'person': 'PersonName', 'place': 'LocName'}
 SHEET_NS = 'http://schemas.openxmlformats.org/spreadsheetml/2006/main'
 
 
-def read_names(source):
-    """Preserve independent name forms, expanding aliases without identity merging."""
+def read_names(source, full_single_names=()):
+    """Read canonical names and confirmed multi-character aliases for platform matching."""
     names = set()
+    full_single_names = set(full_single_names)
+    if any(len(name) != 1 for name in full_single_names):
+        raise ValueError("full_single_names must contain single-character complete names")
     with Path(source).open(encoding='utf-8-sig', newline='') as stream:
         reader = csv.DictReader(stream)
         if reader.fieldnames not in (['name', 'type', 'alias'], ['name', 'type']):
@@ -31,7 +34,14 @@ def read_names(source):
             typ = row['type']
             if typ not in ALL or not row['name'].strip():
                 raise ValueError(f'Invalid name/type on CSV row {number}')
-            forms = [row['name']] + [a for a in row.get('alias', '').split('|') if a]
+            if any(c in row['name'] + row.get('alias', '') for c in '\t\r\n'):
+                raise ValueError(f'Name contains a tab or line break on CSV row {number}')
+            name = row['name'].strip()
+            aliases = [a.strip() for a in row.get('alias', '').split('|') if a.strip()]
+            if (len(name) == 1 and name not in full_single_names) or any(len(a) == 1 for a in aliases):
+                raise ValueError(f'CSV row {number} needs canonical review: single-character abbreviation or unconfirmed name; '
+                                 'save a separately reviewed CSV; use --full-single-names only for confirmed complete names')
+            forms = [name] + aliases
             for name in forms:
                 # Plain TSV consumers cannot represent embedded line breaks or tabs.
                 if any(c in name for c in '\t\r\n'):
@@ -102,9 +112,9 @@ def save_export(path, data):
         raise
 
 
-def convert(source, formats):
+def convert(source, formats, full_single_names=()):
     source = Path(source).resolve()
-    names = read_names(source)
+    names = read_names(source, full_single_names)
     outputs = []
     for fmt in dict.fromkeys(formats):
         if fmt == 'markus':
@@ -125,9 +135,11 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--input', required=True, help='Completed Textoria CSV; never modified')
     parser.add_argument('--formats', nargs='+', choices=['markus', 'docusky'], required=True)
+    parser.add_argument('--full-single-names', nargs='*', default=[],
+                        help='Explicitly confirmed complete single-character names, e.g. 牛 馬; never abbreviations')
     args = parser.parse_args()
     print(json.dumps({'csv': str(Path(args.input).resolve()),
-                      'outputs': convert(args.input, args.formats)}, ensure_ascii=False, indent=2))
+                      'outputs': convert(args.input, args.formats, args.full_single_names)}, ensure_ascii=False, indent=2))
 
 
 if __name__ == '__main__':

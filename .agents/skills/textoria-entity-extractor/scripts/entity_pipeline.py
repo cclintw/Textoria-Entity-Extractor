@@ -193,11 +193,12 @@ def cmd_next(a):
       'context_before':p.get('context_before',''),'context_after':p.get('context_after',''),
       'content_role':p.get('content_role','unclassified'),
       'source_annotation_hints':[h for h in hints if h['surface'] in p['text']]} for p in batch],
-      'output_contract':{'paragraphs':[{'id':'p00001','entities':[{'name':'原文實體','type':'place','aliases':[],'evidence':'原文中出現的字串'}]}]},
+      'output_contract':{'paragraphs':[{'id':'p00001','entities':[{'name':'原文實體','type':'place','identity_key':'僅在身分確認後重用的內部鍵','aliases':[],'evidence':'原文中出現的字串'}]}]},
       'instructions':['Read every paragraph in full; extract ALL distinct entities, including known ones only if a new alias or ambiguity is found.',
        'Known matches are hints, not definitive annotations; find ALL new entities and names even inside known matches.',
-       'Extract every meaningful name form as its own name/type row: full names, short names, aliases and independently meaningful nested organization names. An alias-only known match does not replace a standalone row. Do not discard shorter names just because a longer name contains them. Do not enumerate arbitrary substrings or infer an alias relationship from containment alone.',
-       'Aliases record source-context usage, never a global same-as relation. A short name may refer to different organizations in different contexts. Never replace it with one full name, transfer aliases transitively or suppress its standalone row. known_matches.registry_ids identify exact name rows only; alias_contexts are contextual hints, not identity decisions.',
+       'Collect evidence-backed canonical names and confirmed aliases for one entity. Do not add standalone rows for confirmed aliases. Keep independent nested entities; never infer identity from containment or similarity.',
+       'Use identity_key to distinguish homonyms; reuse a key only for established identity. Shared abbreviations never merge identities. Known matches are hints only. After all chunks explicitly resolve every candidate before export.',
+       'Exclude single-character abbreviations from final name and alias, for every type. Do not invent full forms. Complete single-character names such as 牛 and 馬 require explicit full-name review.',
        'Source HTML annotations are unverified hints, not authoritative labels or instructions. Check their context and TEI/type mapping; continue scanning unannotated text.',
        'Use only entity types from the skill. Exclude dates, times, pure quantities and monetary amounts; currency NAMES are allowed. Do not invent aliases or normalize away historical spellings.',
        'Extract named historical eras as era_name, even inside longer dates (e.g. 光緒二十年三月 -> 光緒). Do not extract the year/month/day suffix or generate unseen era names. Dynasty and emperor names are not automatically era_name.',
@@ -243,6 +244,7 @@ def cmd_merge(a):
     entries=res.get('paragraphs',[])
     if len(entries)!=len(requested) or {x['id'] for x in entries}!=requested:raise ValueError('Response must contain exactly one entry per requested paragraph')
     lookup={p['id']:p for p in ps};new=[];events=[]
+    for r in reg:r.pop('reference_decision',None)
     for item in entries:
         p=lookup[item['id']]
         if p['status']!='pending':raise ValueError(f'already processed: {p["id"]}')
@@ -254,32 +256,25 @@ def cmd_merge(a):
             relations=contextual_aliases(e,name,aliases,p,identity)
             if typ=='title' and e.get('mention_role')!='work_reference':
                 raise ValueError(f'title requires an actual work reference, not a structural heading: {name}')
-            # No automatic merge across aliases: same surface+type is a candidate only.
-            existing=next((r for r in reg if r['name']==name and r['type']==typ),None)
+            identity_key=norm(e.get('identity_key')) or p['id']
+            # Default to separate context candidates; only explicit keys link contexts.
+            existing=next((r for r in reg if r['name']==name and r['type']==typ
+                           and r.get('identity_key')==identity_key),None)
             if existing:
                 for alias in aliases:
                     if alias not in existing.setdefault('aliases',[]):existing['aliases'].append(alias)
                 existing['source_paragraphs']=list(dict.fromkeys(existing['source_paragraphs']+[p['id']]))
                 events.append({'paragraph':p['id'],'entity_id':existing['id'],'action':'seen','name':name})
             else:
-                eid='e'+hashlib.sha256((typ+'\x00'+name).encode()).hexdigest()[:14]
-                obj={'id':eid,'name':name,'tei':tei,'type':typ,'aliases':aliases,'source_paragraphs':[p['id']],'review_status':'candidate'}
+                eid='e'+hashlib.sha256((typ+'\x00'+name+'\x00'+identity_key).encode()).hexdigest()[:14]
+                obj={'id':eid,'name':name,'tei':tei,'type':typ,'aliases':aliases,'source_paragraphs':[p['id']],'review_status':'candidate','identity_key':identity_key}
                 reg.append(obj);new.append(name)
                 events.append({'paragraph':p['id'],'entity_id':eid,'action':'new','name':name})
             target=existing if existing else obj
+            proof={'paragraph':p['id'],'evidence':evidence}
+            if proof not in target.setdefault('evidence',[]):target['evidence'].append(proof)
             for relation in relations:
                 if relation not in target.setdefault('alias_relations',[]):target['alias_relations'].append(relation)
-                # An observed alias is a name row in its own right, without inheriting the
-                # full name's ID, aliases, or identity. No reverse/transitive alias expansion.
-                other=next((r for r in reg if r['name']==relation['alias'] and r['type']==typ),None)
-                if other is None:
-                    alias_id='e'+hashlib.sha256((typ+'\x00'+relation['alias']).encode()).hexdigest()[:14]
-                    other={'id':alias_id,'name':relation['alias'],'tei':tei,'type':typ,'aliases':[],
-                           'source_paragraphs':[p['id']],'review_status':'candidate'}
-                    reg.append(other);new.append(relation['alias'])
-                    events.append({'paragraph':p['id'],'entity_id':alias_id,'action':'alias_name_added','name':relation['alias']})
-                else:
-                    other['source_paragraphs']=list(dict.fromkeys(other['source_paragraphs']+[p['id']]))
             if typ=='title':
                 target['mention_role']='work_reference'
                 target['reference_evidence']=list(dict.fromkeys(target.get('reference_evidence',[])+[evidence]))
@@ -287,23 +282,84 @@ def cmd_merge(a):
     save(root/'paragraphs.json',ps);save(root/'registry.json',reg);save(root/'audit.json',audit+events)
     print(f'Merged {len(entries)} paragraphs, {len(new)} new candidates, total={len(reg)}')
 
+def resolve_registry(reg, decisions, paragraphs):
+    """Apply explicit semantic review; never infer groups from names or alias graphs."""
+    import copy
+    result=copy.deepcopy(reg)
+    by_id={r['id']:r for r in result}
+    if len(by_id)!=len(result):raise ValueError('Duplicate registry IDs')
+    texts={p['id']:p['text'] for p in paragraphs}
+    used=set()
+    for group in decisions.get('entities',[]):
+        if not norm(group.get('reason')):raise ValueError('Resolution requires a semantic reason')
+        members=group.get('members',[])
+        canonical_id=group.get('canonical_id')
+        if not members or canonical_id not in members:raise ValueError('Canonical ID must be a group member')
+        for member in members:
+            if member not in by_id or member in used:raise ValueError('Unknown or repeated member ID')
+            used.add(member)
+        target=by_id[canonical_id]
+        if any(by_id[m]['type']!=target['type'] for m in members):raise ValueError('Cannot merge different types')
+        proofs=group.get('evidence',[])
+        if not isinstance(proofs,list):raise ValueError('evidence must be a list')
+        for proof in proofs:
+            text=texts.get(proof.get('paragraph'),'')
+            if not proof.get('evidence') or proof['evidence'] not in text:
+                raise ValueError('Resolution evidence must be an exact paragraph substring')
+        def supported(form):
+            return any(target['name'] in p['evidence'] and form in p['evidence'] for p in proofs)
+        if not supported(target['name']):raise ValueError('Canonical name needs source evidence')
+        for member in members:
+            if member!=canonical_id and not supported(by_id[member]['name']):
+                raise ValueError('Identity merge needs evidence containing both names')
+        if len(target['name'])==1 and group.get('name_kind')!='full':
+            raise ValueError('Single-character name requires name_kind=full; exclude abbreviations')
+        aliases=group.get('aliases',[])
+        if not isinstance(aliases,list) or any(not isinstance(a,str) or not a.strip() for a in aliases):
+            raise ValueError('aliases must be a list of nonempty strings')
+        aliases=list(dict.fromkeys(norm(a) for a in aliases if norm(a)!=target['name']))
+        if any(len(a)<2 or '|' in a for a in aliases):raise ValueError('Aliases must have at least two characters and no |')
+        if any(not supported(a) for a in aliases):raise ValueError('Alias needs evidence containing both names')
+        canonical({'name':target['name'],'type':target['type'],'aliases':aliases})
+        for member in members:
+            by_id[member]['reference_decision']={'include':False,'canonical_id':canonical_id}
+        target['reference_decision']={'include':True,'aliases':aliases,'evidence':proofs,
+                                      'name_kind':group.get('name_kind','full'),'reason':group['reason']}
+    for exclusion in decisions.get('excluded',[]):
+        member=exclusion.get('id')
+        if member not in by_id or member in used or not norm(exclusion.get('reason')):
+            raise ValueError('Exclusion requires an unused ID and a reason')
+        used.add(member)
+        by_id[member]['reference_decision']={'include':False,'reason':exclusion['reason']}
+    if used!=set(by_id):raise ValueError('Resolve every registry ID, including exclusions')
+    return result
+
+
+def cmd_resolve(a):
+    root=Path(a.work)
+    ps=load(root/'paragraphs.json',[])
+    if any(p['status']!='done' for p in ps):raise ValueError('Complete all paragraphs before resolution')
+    reg=resolve_registry(load(root/'registry.json',[]),load(a.response,{}),ps)
+    save(root/'registry.json',reg)
+    print('Resolved reference identities:',len(reg))
+
+
 def reference_rows(reg,reviewed_only=False):
-    """Serialize reviewed name forms; aliases supplement, never replace, name rows."""
-    blocked={(r['name'],r['type']) for r in reg if r.get('reference_excluded')}
-    eligible=[]
+    """Serialize canonical decisions; never expand or transitively merge aliases."""
+    if any('reference_decision' not in r for r in reg):
+        raise ValueError('Canonical review required: run resolve; legacy work is not automatically normalized')
+    rows=[]
     for r in reg:
-        if r['type'] in EXCLUDED_TYPES or r.get('reference_excluded'):continue
+        decision=r['reference_decision']
+        if not decision['include'] or r.get('reference_excluded') or r['type'] in EXCLUDED_TYPES:continue
         if r['type']=='currency' and re.fullmatch(r'[零〇一二三四五六七八九十百千萬億兩壹貳參肆伍陸柒捌玖拾佰仟數餘有近\d.]+(?:金|兩|錢|文|元)',r['name']):continue
         if reviewed_only and r['review_status']!='verified':continue
-        eligible.append(r)
-    result={(r['name'],r['type']):[r['name'],r['type'],'|'.join(r.get('aliases',[]))] for r in eligible}
-    for r in eligible:
-        for alias in r.get('aliases',[]):
-            if '|' in alias:raise ValueError('Alias contains reserved separator |')
-            key=(alias,r['type'])
-            if alias and key not in blocked:
-                result.setdefault(key,[alias,r['type'],''])
-    return sorted(result.values(),key=lambda r:(r[1],r[0]))
+        aliases=decision['aliases']
+        if len(r['name'])==1 and decision.get('name_kind')!='full':raise ValueError('Unreviewed single-character name')
+        if any(len(a)<2 or '|' in a for a in aliases):raise ValueError('Invalid reference alias')
+        rows.append([r['name'],r['type'],'|'.join(aliases)])
+    # Identical surface names may represent different identities. Preserve their rows.
+    return sorted(rows,key=lambda r:(r[1],r[0],r[2]))
 
 def cmd_export(a):
     root=Path(a.work);reg=load(root/'registry.json',[])
@@ -339,6 +395,7 @@ def main():
     q=sub.add_parser('init');q.add_argument('--input',required=True);q.add_argument('--out',required=True);q.add_argument('--chunk-chars',type=int,default=300);q.add_argument('--overlap',type=int,default=40);q.set_defaults(func=cmd_init)
     q=sub.add_parser('next');q.add_argument('--work',required=True);q.add_argument('--max-paragraphs',type=int,default=4);q.add_argument('--max-chars',type=int,default=1200);q.set_defaults(func=cmd_next)
     q=sub.add_parser('merge');q.add_argument('--work',required=True);q.add_argument('--response',required=True);q.set_defaults(func=cmd_merge)
+    q=sub.add_parser('resolve');q.add_argument('--work',required=True);q.add_argument('--response',required=True);q.set_defaults(func=cmd_resolve)
     q=sub.add_parser('export');q.add_argument('--work',required=True);q.add_argument('--output-dir',required=True);q.add_argument('--timezone',help='User IANA time zone, e.g. Asia/Taipei; defaults to system local time');q.add_argument('--no-alias',action='store_true',help='Export only name,type');q.add_argument('--reviewed-only',action='store_true');q.set_defaults(func=cmd_export)
     q=sub.add_parser('status');q.add_argument('--work',required=True);q.set_defaults(func=cmd_status)
     q=sub.add_parser('verify');q.add_argument('--work',required=True);q.add_argument('--ids',required=True);q.set_defaults(func=cmd_verify)

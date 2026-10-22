@@ -61,7 +61,7 @@ The CSV is automatically saved in the project's `textoria-entity-extractor/csv/`
 Textoria CSV is always included. Before extraction, Codex asks whether you also want **MARKUS TXT**, **DocuSky XLSX**, both, or CSV only, unless you have already specified your preference. Extraction runs once; the selected platform files are converted from the completed CSV with Python's standard library, without another LLM extraction pass. You can also ask to convert an existing Textoria CSV later.
 
 - **MARKUS TXT:** UTF-8 with a Tab-separated `tagtype`, `tag`, `id` header and three columns on every data row, including an empty ID field. Paste the data rows (excluding the header) into **Batch Markup**. No trailing blank line is added. Uses built-in MARKUS tags where available and custom tags otherwise; IDs are blank to avoid inventing authority identifiers.
-- **DocuSky XLSX:** an Excel workbook for **ContentTagging / BatchTagging**, with `tagName,tagVal,@Term` columns. People map to `PersonName`, places to `LocName`, and other types to `Udef_<type>`. `@Term` stays blank; aliases remain independent names rather than global replacements.
+- **DocuSky XLSX:** an Excel workbook for **ContentTagging / BatchTagging**, with `tagName,tagVal,@Term` columns. People map to `PersonName`, places to `LocName`, and other types to `Udef_<type>`. `@Term` stays blank; confirmed multi-character aliases become platform matching terms.
 
 Additional files are saved beside the CSV as `markus-<CSV-stem>.txt` and `docusky-<CSV-stem>.xlsx`. The CSV remains the editable master. These are vocabulary inputs, not already annotated texts; review the resulting platform annotations. See [conversion rules and commands](.agents/skills/textoria-entity-extractor/references/platform-exports.md).
 
@@ -95,7 +95,7 @@ Expand the section below and use the code block's copy button. Paste the prompt 
 
 ## 提取範圍
 
-只提取名稱、英文類型及可確定的別名，不查人物生平、不補現代地名、不換算日期。
+提取名稱、英文類型與證據後，完成正名及身分整理；不憑記憶補全縮稱、不套用現代地名、不換算日期。
 
 使用以下 type：
 
@@ -103,35 +103,38 @@ Expand the section below and use the code block's copy button. Paste the prompt 
 
 - 人名為 person；聚落、番社、行政區、港口、山川及國家等為 place；官署、機構與具名團體為 organization；具名族群為 ethnic_group。
 - 作品名稱為 title；官職為 office，固定官銜或爵號為 official_title。動植物、物產、器物等保留有辨識價值的名稱，不收所有動作、抽象概念及普通修飾語。
-- name 必須是原文出現的完整連續字串，保留繁簡、異體與歷史寫法，不改字、補字或套用外部標準名。
+- name 選用有證據支持、原文出現的正名；保留繁簡、異體與歷史寫法，不憑字串相似或記憶補字。
 - 不收完整日期、時間、純數量、距離、重量或金額；貨幣名稱可收。名稱本身含數字仍保留，例如三板、三峽。
 - 本文標題、篇名、卷名及目錄項不直接當成 title，但其中其他實體仍須提取，例如「關於作者郁永河」收郁永河/person。正文或標題明確引用其他作品時，依引用語境收錄作品名稱；不因同名項曾是結構標題就全域排除。
 - 年號只收名稱，例如「光緒二十年三月五日」收光緒/era_name，完整日期不放入 name 或 alias。不由干支、朝代或帝王名推造年號，不擴寫原文中的年號縮稱，民國紀年不自動當帝王年號。
 
-## 名稱、去重與別名
+## 正名、身分與別名
 
-- 同一 name,type 只留一列；同名不同 type 可分列。這是名稱參考庫，不是人物或地點的唯一身分表。
-- 全稱、簡稱、別名及有獨立實體意義的巢狀名稱，都須各自列為 name，不能只保留最長名稱或把其他形式藏在 alias。兩欄輸出也適用。不列任意子字串，不推造原文沒有的名稱。
-- alias 只在原文明示或上下文能確定同一指稱時填入，不確定留空。多個別名以半形 `|` 分隔，刪除重複值及與 name 相同的值。若別名本身含 `|`，先說明格式衝突，不靜默拆分。
-- 不把同姓、名稱相似、共用官稱或上級與下級機構當別名。不因共用簡稱合併不同全稱，也不透過別名推論新的等同關係。
-- 別名關係只適用來源語境，不是跨文本永久等號。同名涉及不同對象時，不把其中一個對象的別名套用到整個同名項。只有簡稱出現而指稱不明時，照常收名稱，alias 留空。
+- 全文提取後回查證據，將已確認同一實體的不同表記整理為一列。name 為正名；alias 收已確認同一實體的別名、字號、異稱或兩字以上簡稱，不另外建立簡稱／別名的獨立 name 列。兩欄輸出也不重新展開 alias。
+- 不憑包含關係、姓名相似、同姓、共同官稱或共同簡稱合併，不透過 alias 傳遞推論身分。同名異人及歧義名稱保留區別；必要時可有相同 name,type 的不同列，並說明三欄格式無法完整表達身分差異。不把某人的別名套用到所有同名者。
+- alias 只在原文明示或可靠上下文確認同一指稱時填入，不確定留空。多值以半形 `|` 分隔，刪除重複值及與 name 相同的值；別名本身含 `|` 時說明格式衝突，不靜默拆分。
+- 人物、地點、器物及其他類型的單字簡稱均不進入正式 name 或 alias。「經、漳、泉」若為簡稱，有可靠證據時只收鄭經、漳州、泉州；無法確認則不臆補、不收該縮稱。牛、馬等本身就是完整名稱時可作 name，這不是禁止所有單字。alias 至少兩字。
+- 上級與下級機構等具有獨立實體意義的巢狀名稱仍分列；不列任意子字串。未確認關係的兩字以上名稱可分別保留。
 
-例如，語境能確認這些名稱時，分別保留：
+例如，只有證據支持以下正名及別名關係時，整理為：
 
 ```csv
 name,type,alias
-法務部,organization,
-法務部調查局,organization,調查局
-調查局,organization,
+鄭經,person,
+吳三桂,person,三桂
+漳州,place,
+泉州,place,
+福州,place,榕城
 ```
 
-以上僅為格式示例，不可直接加入實際結果。
+以上僅為格式示例，不可直接加入結果；「榕城→福州」不能無條件套用。
 
 ## 檢查與交付
 
-- 回查原文，確認所有 name、alias 均有出處，類型及別名關係符合上下文，沒有重複 name,type，也沒有漏掉別名的獨立名稱列。已知名稱搜尋只能輔助驗證，不能取代原文漏項檢查。
+- 回查原文，確認所有 name、alias 均有出處，類型及別名關係符合上下文，已確認的同一身分沒有重複列、單字簡稱未進入 name 或 alias。已知名稱搜尋只能輔助驗證，不能取代原文漏項檢查。
 - 預設只交付一份 CSV，固定欄位為 `name,type,alias`；我明確不要別名時改為 `name,type`。不增加證據、編號、日期或統計欄。
 - 建立 UTF-8 BOM 的 CSV，正確處理引號、逗號與空欄，依 type、name 排序，以來源名稱命名，不覆蓋既有檔案。
+- 不新增正式 JSON、HTML、TEI、逐處標註或資料庫匯出。舊 CSV 不靜默改寫；需根據證據重新整理並另存新檔，不自動重新提取。正名及兩字以上別名仍可能誤匹配普通詞，詞表不保證所有語境正確。
 - 完成時只簡短提供實際 CSV 下載連結。若無法建立檔案，說明並提供可另存的 CSV 文字，不捏造連結；未完成時須說明範圍，不宣稱百分之百無遺漏。
 
 ````
@@ -143,20 +146,21 @@ name,type,alias
 
 ```csv
 name,type,alias
-法務部,organization,
-法務部調查局,organization,調查局
-調查局,organization,
-光緒,era_name,
+鄭經,person,
+吳三桂,person,三桂
+漳州,place,
+泉州,place,
+福州,place,榕城
 ```
 
 This is an illustrative example, not a built-in entity dictionary.
 
 - **Only name data:** The default columns are `name,type,alias`. Request `name,type` if you do not want alias information. No TEI element, date, evidence, ID, or count columns are added. CSV files use UTF-8 with BOM.
-- **Independent name forms:** Full names, short names, aliases, and semantically meaningful nested names each receive their own `name,type` row. Only identical name/type pairs are deduplicated; arbitrary substrings are not entities.
-- **Contextual aliases:** Multiple aliases are separated by `|` in one field; unknown aliases are blank. An alias records usage in the source context, not a permanent cross-text identity or replacement rule. Shared short names never merge different full names.
+- **Canonical reference rows:** Evidence-backed forms of one entity are consolidated under its canonical name; confirmed aliases stay in `alias`, without separate CSV rows. Independent nested entities remain separate. Homonyms and ambiguous names are not merged by spelling, containment, or shared aliases.
+- **Confirmed aliases:** Use `|` between aliases of at least two characters; unknown relations stay blank. Single-character abbreviations are excluded from both name and alias, across all types. Complete one-character names such as 牛 and 馬 may remain as canonical names after review. The 榕城/福州 relation in the example requires evidence.
 - **Titles:** The document's own headings and volume labels are not automatically `title` entities. Other entities inside headings are still extracted. Names of works referenced in the text can be `title`.
 - **Named eras:** `光緒二十年三月五日` contributes `光緒,era_name`, not a precomputed date entry. Complete dates, times, measurements, and monetary amounts are excluded; currency names can be included.
-- **Original forms:** Historical names and spelling variants are preserved. The workflow extracts a reference inventory; downstream annotation, identity resolution, and calendar conversion are outside its scope.
+- **Original forms:** Historical names and spelling variants are preserved. The workflow extracts a reference inventory; identity review uses source evidence; downstream annotation and calendar conversion remain outside its scope.
 
 Supported types:
 
@@ -164,7 +168,11 @@ Supported types:
 
 ## How processing works
 
-Codex reads the text section by section, builds an entity list, checks it against the source, removes duplicates, and exports a CSV. Work is kept in system temporary storage during processing and removed after a successful export. Interrupted runs can resume while their temporary work still exists.
+Codex reads the text section by section, builds an entity list, checks it against the source, explicitly reviews canonical names and identities with `resolve`, and exports a CSV. Same-name identities may retain separate rows; the fixed columns cannot fully express their distinction. Work is kept in system temporary storage during processing and removed after a successful export. Interrupted runs can resume while their temporary work still exists.
+
+Legacy CSVs are never silently rewritten. They require evidence-based review and a separately saved file; conversion cannot infer identities from CSV strings. Platform converters reject single-character aliases and unconfirmed single-character names before writing files. Pass `--full-single-names 牛 馬` only for reviewed complete names. Confirmed multi-character aliases may become platform matching terms, but are never additional rows in the formal CSV. Platform vocabularies cannot distinguish homonyms, and canonical names or aliases may still match ordinary words incorrectly. No HTML, TEI, occurrence annotation, database export, or formal JSON output is added.
+
+Run the synthetic regression suite with `python3 -m unittest discover -s tests -v`. Tests use temporary files and do not process existing texts or outputs.
 
 ## Output files
 
