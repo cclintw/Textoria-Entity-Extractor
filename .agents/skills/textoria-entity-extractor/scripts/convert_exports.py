@@ -9,7 +9,7 @@ from pathlib import Path
 from xml.etree import ElementTree as ET
 from zipfile import ZipFile, ZipInfo, ZIP_DEFLATED
 
-from entity_pipeline import ALL
+from entity_pipeline import ALL, validate_reference_name
 
 # Use MARKUS's built-in categories where available, otherwise custom tag names.
 MARKUS_TYPES = {'person': 'fullName', 'place': 'placeName', 'office': 'officialTitle',
@@ -38,7 +38,8 @@ def read_names(source, full_single_names=()):
                 raise ValueError(f'Name contains a tab or line break on CSV row {number}')
             name = row['name'].strip()
             aliases = [a.strip() for a in row.get('alias', '').split('|') if a.strip()]
-            if (len(name) == 1 and name not in full_single_names) or any(len(a) == 1 for a in aliases):
+            validate_reference_name(name, typ, name in full_single_names)
+            if any(len(a) == 1 for a in aliases):
                 raise ValueError(f'CSV row {number} needs canonical review: single-character abbreviation or unconfirmed name; '
                                  'save a separately reviewed CSV; use --full-single-names only for confirmed complete names')
             forms = [name] + aliases
@@ -136,7 +137,7 @@ def main():
     parser.add_argument('--input', required=True, help='Completed Textoria CSV; never modified')
     parser.add_argument('--formats', nargs='+', choices=['markus', 'docusky'], required=True)
     parser.add_argument('--full-single-names', nargs='*', default=[],
-                        help='Explicitly confirmed complete single-character names, e.g. 牛 馬; never abbreviations')
+                        help='Confirmed complete single-character names of types OTHER than person/place/office/official_title, e.g. 牛 馬; never abbreviations')
     args = parser.parse_args()
     print(json.dumps({'csv': str(Path(args.input).resolve()),
                       'outputs': convert(args.input, args.formats, args.full_single_names)}, ensure_ascii=False, indent=2))

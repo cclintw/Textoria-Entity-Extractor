@@ -46,7 +46,7 @@ name,type,alias
 
 ### 單字簡稱與完整單字名稱
 
-人物、地點、器物及其他類型一律不收單字簡稱到正式 name 或 alias。「經、漳、泉」若為簡稱，確認正名後只收鄭經、漳州、泉州；無可靠證據時排除縮稱、不臆補正名。這不是長度黑名單：牛、馬等本身就是完整名稱時可收為 name。單字名稱須在最終審核明確指定 `name_kind: "full"`；alias 一律至少兩字。
+人名（person）、地名與行政區（place）、官職與官銜（office、official_title）的 name、alias 一律至少兩字，完整單字人名、地名、行政區名或官職名也不得收錄，name_kind=full 不得豁免。器物及其他類型不收單字簡稱到正式 name 或 alias。「經、漳、泉」若為簡稱，確認正名後只收鄭經、漳州、泉州；無可靠證據時排除縮稱、不臆補正名。其他類型不是全面禁止單字：牛、馬等本身就是完整名稱時可收為 name。僅其他類型的完整單字名稱可在最終審核明確指定 `name_kind: "full"`；alias 一律至少兩字。
 
 內部提取可保留單字簡稱及未確認名稱作待審候選。`aliases` 新增時仍須有包含 name 與 alias 的原文證據（`evidence` 或 `alias_evidence`），程式保存為 `alias_relations` 來源語境提示，不自動生成獨立 name。證據是否確立同一身分由 Agent 判斷，字串同時出現只是驗證條件，不是語意證明。舊工作庫 alias 不直接升為正式別名。
 
@@ -189,7 +189,7 @@ name 與 evidence 須為原文連續字串；evidence 僅供內部驗證。將�
 {"entities":[{"canonical_id":"e_wu","members":["e_wu","e_sangui"],"aliases":["三桂"],"reason":"原文明示三桂為吳三桂簡稱","evidence":[{"paragraph":"p00001","evidence":"吳三桂，文中簡稱三桂。"}]}],"excluded":[{"id":"e_jing","reason":"未確認正名的單字簡稱"}]}
 ```
 
-以上 ID 與原文僅為示意，須換成工作庫實際資料。每組選一個已觀察、具證據的正名 ID；`members` 只放已確認同一身分的候選，`aliases` 明列要保留的兩字以上別名（不自動繼承舊 alias）。其他名稱若為獨立身分就保留為另一組，不按共同 alias 合併。相同正名的不同人物各保留自己的組，必要時交付歧義說明。單字完整名稱另加 `name_kind: "full"`；單字簡稱用 excluded 或只作已確認正名的內部 member，不加入 alias。
+以上 ID 與原文僅為示意，須換成工作庫實際資料。每組選一個已觀察、具證據的正名 ID；`members` 只放已確認同一身分的候選，`aliases` 明列要保留的兩字以上別名（不自動繼承舊 alias）。其他名稱若為獨立身分就保留為另一組，不按共同 alias 合併。相同正名的不同人物各保留自己的組，必要時交付歧義說明。其他類型的單字完整名稱另加 `name_kind: "full"`；person、place（含行政區）、office、official_title 單字候選一律不得作正名或別名，單字簡稱用 excluded 或只作已確認正名的內部 member，不加入 alias。
 
 每組必須有 `reason` 說明語意判斷，並以 evidence 提供正名的原文出處。合併候選及填 alias 還須提供含正名和該表記的原文證據：`evidence` 每項指向實際片段與其中的連續原文。這是保守的可驗證證據門檻；跨片關係若無單一片段能同時支持兩名，先保留區別並說明未完成關係，不為通過驗證而編造證據。單純同時出現不能當作身分依據。
 
@@ -205,6 +205,6 @@ resolve 驗證完整覆蓋、型別及原文字串，將決定寫回暫存 regis
 <PYTHON> "<SKILL_DIR>/scripts/entity_pipeline.py" export --work "<WORK>" --output-dir "<OUTPUT_DIR>" --timezone "<USER_TIMEZONE>"
 ```
 
-OUTPUT_DIR 為來源準備回傳的 csv/，USER_TIMEZONE 採對話提供的 IANA 時區，例如 Asia/Taipei；未提供才省略。只要兩欄時加 --no-alias。export 會回讀驗證 CSV 並清除本次暫存工作目錄；Agent 再核對正式 CSV 存在、表頭與欄數正確、沒有已確認同一身分的重複列（同名異人可同名同類）、未混入日期時間、純數量或單字簡稱，alias 未被另建列。
+OUTPUT_DIR 為來源準備回傳的 csv/，USER_TIMEZONE 採對話提供的 IANA 時區，例如 Asia/Taipei；未提供才省略。只要兩欄時加 --no-alias。export 會回讀驗證 CSV 並清除本次暫存工作目錄；Agent 再核對正式 CSV 存在、表頭與欄數正確、沒有已確認同一身分的重複列（同名異人可同名同類）、未混入日期時間、純數量或單字簡稱，person、place（含行政區）、office、official_title 的 name 及 alias 均至少兩字，alias 未被另建列。
 
-若選了附加格式，讀取 [平台轉檔規則](platform-exports.md)，使用 export 回傳的 CSV 絕對路徑執行 `convert_exports.py --input "<CSV_PATH>" --formats markus docusky`；只選一種時只傳該格式。若 CSV 包含經確認的完整單字 name，須以 `--full-single-names 牛 馬` 明列實際保留的完整單字；不得把單字簡稱傳入此選項。只要 CSV 就省略此步。轉檔失敗保留 CSV，從 CSV 修正重試，不重做全文。最後提供預設 CSV 與已選且成功產生的平台檔連結及必要說明，不列統計，也不要求使用者操作程式。
+若選了附加格式，讀取 [平台轉檔規則](platform-exports.md)，使用 export 回傳的 CSV 絕對路徑執行 `convert_exports.py --input "<CSV_PATH>" --formats markus docusky`；只選一種時只傳該格式。若 CSV 包含 person、place（含行政區）、office、official_title 以外經確認的完整單字 name，須以 `--full-single-names 牛 馬` 明列實際保留的完整單字；不得把單字簡稱傳入此選項。只要 CSV 就省略此步。轉檔失敗保留 CSV，從 CSV 修正重試，不重做全文。最後提供預設 CSV 與已選且成功產生的平台檔連結及必要說明，不列統計，也不要求使用者操作程式。

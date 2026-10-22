@@ -113,7 +113,7 @@ Expand the section below and use the code block's copy button. Paste the prompt 
 - 全文提取後回查證據，將已確認同一實體的不同表記整理為一列。name 為正名；alias 收已確認同一實體的別名、字號、異稱或兩字以上簡稱，不另外建立簡稱／別名的獨立 name 列。兩欄輸出也不重新展開 alias。
 - 不憑包含關係、姓名相似、同姓、共同官稱或共同簡稱合併，不透過 alias 傳遞推論身分。同名異人及歧義名稱保留區別；必要時可有相同 name,type 的不同列，並說明三欄格式無法完整表達身分差異。不把某人的別名套用到所有同名者。
 - alias 只在原文明示或可靠上下文確認同一指稱時填入，不確定留空。多值以半形 `|` 分隔，刪除重複值及與 name 相同的值；別名本身含 `|` 時說明格式衝突，不靜默拆分。
-- 人物、地點、器物及其他類型的單字簡稱均不進入正式 name 或 alias。「經、漳、泉」若為簡稱，有可靠證據時只收鄭經、漳州、泉州；無法確認則不臆補、不收該縮稱。牛、馬等本身就是完整名稱時可作 name，這不是禁止所有單字。alias 至少兩字。
+- 人名（person）、地名與行政區（place）、官職與官銜（office、official_title）的 name、alias 一律至少兩字，即使是完整單字名稱也不得收錄。器物及其他類型的單字簡稱不進入正式 name 或 alias。「經、漳、泉」若為簡稱，有可靠證據時只收鄭經、漳州、泉州；無法確認則不臆補、不收該縮稱。其他類型如牛、馬等本身就是完整名稱時可作 name，僅其他類型可保留完整單字。alias 至少兩字。
 - 上級與下級機構等具有獨立實體意義的巢狀名稱仍分列；不列任意子字串。未確認關係的兩字以上名稱可分別保留。
 
 例如，只有證據支持以下正名及別名關係時，整理為：
@@ -157,7 +157,7 @@ This is an illustrative example, not a built-in entity dictionary.
 
 - **Only name data:** The default columns are `name,type,alias`. Request `name,type` if you do not want alias information. No TEI element, date, evidence, ID, or count columns are added. CSV files use UTF-8 with BOM.
 - **Canonical reference rows:** Evidence-backed forms of one entity are consolidated under its canonical name; confirmed aliases stay in `alias`, without separate CSV rows. Independent nested entities remain separate. Homonyms and ambiguous names are not merged by spelling, containment, or shared aliases.
-- **Confirmed aliases:** Use `|` between aliases of at least two characters; unknown relations stay blank. Single-character abbreviations are excluded from both name and alias, across all types. Complete one-character names such as 牛 and 馬 may remain as canonical names after review. The 榕城/福州 relation in the example requires evidence.
+- **Confirmed aliases:** Use `|` between aliases of at least two characters; unknown relations stay blank. For person/place/office/official_title (administrative divisions use place), name and alias must always have at least two characters, including complete names. Other types exclude single-character abbreviations; complete one-character names such as 牛 and 馬 may remain after review. The 榕城/福州 relation in the example requires evidence.
 - **Titles:** The document's own headings and volume labels are not automatically `title` entities. Other entities inside headings are still extracted. Names of works referenced in the text can be `title`.
 - **Named eras:** `光緒二十年三月五日` contributes `光緒,era_name`, not a precomputed date entry. Complete dates, times, measurements, and monetary amounts are excluded; currency names can be included.
 - **Original forms:** Historical names and spelling variants are preserved. The workflow extracts a reference inventory; identity review uses source evidence; downstream annotation and calendar conversion remain outside its scope.
@@ -170,9 +170,7 @@ Supported types:
 
 Codex reads the text section by section, builds an entity list, checks it against the source, explicitly reviews canonical names and identities with `resolve`, and exports a CSV. Same-name identities may retain separate rows; the fixed columns cannot fully express their distinction. Work is kept in system temporary storage during processing and removed after a successful export. Interrupted runs can resume while their temporary work still exists.
 
-Legacy CSVs are never silently rewritten. They require evidence-based review and a separately saved file; conversion cannot infer identities from CSV strings. Platform converters reject single-character aliases and unconfirmed single-character names before writing files. Pass `--full-single-names 牛 馬` only for reviewed complete names. Confirmed multi-character aliases may become platform matching terms, but are never additional rows in the formal CSV. Platform vocabularies cannot distinguish homonyms, and canonical names or aliases may still match ordinary words incorrectly. No HTML, TEI, occurrence annotation, database export, or formal JSON output is added.
-
-Run the synthetic regression suite with `python3 -m unittest discover -s tests -v`. Tests use temporary files and do not process existing texts or outputs.
+Legacy CSVs are never silently rewritten. They require evidence-based review and a separately saved file; conversion cannot infer identities from CSV strings. Platform converters reject single-character aliases and unconfirmed single-character names before writing files. Pass `--full-single-names 牛 馬` only for reviewed complete names of other types; it never permits a single-character person, place, administrative-division, office or official-title name. Confirmed multi-character aliases may become platform matching terms, but are never additional rows in the formal CSV. Platform vocabularies cannot distinguish homonyms, and canonical names or aliases may still match ordinary words incorrectly. No HTML, TEI, occurrence annotation, database export, or formal JSON output is added.
 
 ## Output files
 

@@ -22,7 +22,7 @@ Textoria CSV 是每次提取必備的主檔，格式為 `name,type,alias`（明�
 - MARKUS：UTF-8 純文字，**第一列必須是以 Tab 分隔的 `tagtype<TAB>tag<TAB>id` 表頭**。資料列也固定三欄，ID 無資料時保留第二個 Tab，第三欄留空。不加結尾換行或空白列。貼入 Batch Markup／批量標記時只複製第二列起的資料，因官方頁面的貼上處理器不略過表頭或空白列。`person → fullName`、`place → placeName`、`office／official_title → officialTitle`、`era_name → nianhao`；其他類型保留英文 type 作為自訂標籤，可在 MARKUS 管理標記中設定顏色與按鈕。`id` 留空：MARKUS 將 fullName 的 id 當成 CBDB ID，因此不得捏造 P001 等本地流水號，也不把不同名稱共用 ID。空詞表無法用於 Batch Markup，會報錯並保留 CSV。
 - DocuSky：實際 `.xlsx` 活頁簿，單一 `entities` 工作表，第一列 `tagName,tagVal,@Term`。`person → PersonName`、`place → LocName`，其餘類型為 `Udef_<type>`。所有儲存格都是文字，`@Term` 留空，完整名稱與別名各自標記，不把來源語境的 alias 升格為全域統一名稱。
 - 兩種平台檔都將較長名稱排前面；映射到相同平台標籤的同名項去重。平台的字串比對與同名多義仍需使用者檢視，不保證匯入後的全文標記完全正確。
-- 單字 alias 一律拒絕；單字 name 預設也拒絕，因固定 CSV 欄位無法判定它是完整名稱或簡稱。經審核的完整單字名稱（例如牛、馬）以 `--full-single-names 牛 馬` 明確傳入才保留，這是語意確認，不是簡稱豁免，不得將經、漳、泉等縮稱傳入。任何拒絕均發生於寫出平台檔之前，不靜默刪字或補全名稱。
+- 單字 alias 一律拒絕；person、place（含行政區）、office、official_title 的單字 name 也一律拒絕，包含完整名稱，--full-single-names 不得豁免。其他類型的單字 name 預設拒絕，因固定 CSV 欄位無法判定它是完整名稱或簡稱。僅其他類型經審核的完整單字名稱（例如牛、馬）以 `--full-single-names 牛 馬` 明確傳入才保留，這是語意確認，不是簡稱豁免，不得將經、漳、泉等縮稱傳入。任何拒絕均發生於寫出平台檔之前，不靜默刪字或補全名稱。
 - 舊 CSV 不自動正名或改寫。缺乏原文／身分證據時不能可靠整理，說明限制；有證據時另存經審核的新 CSV 再轉，不自動重提文本。
 - 正名與兩字以上別名也可能在普通詞中誤匹配，平台詞表不保證所有語境正確。
 - 轉檔程式拒絕格式不符的主檔、未知 type、含 Tab／換行／XML 不支援字元的名稱及超過 Excel 限制的資料，不靜默刪除名稱。
