@@ -3,6 +3,7 @@
 /source/
 /csv/
 /textoria-output/
+/tests
 
 # 本機環境變數與憑證設定；公開範本可保留
 .env
