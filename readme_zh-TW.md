@@ -2,80 +2,91 @@
 
 [English](README.md) · [ChatGPT 短文本提示詞](prompt.md) · [Codex Skill](.agents/skills/textoria-entity-extractor/SKILL.md) · [GPL v3 或後續版本授權](LICENSE)
 
-文本標註最需要的基礎資源之一，就是標註參考詞表。雖然我們可以透過 API 或 MCP 取得外部權威詞表，但並非所有文本類型都能找到合適的參考資源。最終往往仍須依據文本內容，自行建立專屬的標註參考詞表。但是人工整理詞表不僅繁瑣，也是文本標註過程中最耗時的工作之一。
+Textoria Entity Extractor 協助您從文本中建立實體參考詞表，減少逐項整理名稱的時間。它會依原文辨識實體，核對正名與別名，輸出可用試算表檢視、修改的 CSV，供後續文本標註使用。
 
-此 Codex Skill 主要為了解決這個問題，它運用增量式實體提取方法。基本概念很簡單：先從全文提取命名實體，建立實體清單，再將這份清單作為後續文本標註的參考詞表。因此，在使用 MARKUS、DocuSky 等文本標註平台之前，可以先透過此 Skill 自動提取文本中的人物、地名、官職、機構等實體，產生 CSV 格式的參考詞表，再匯入支援相應詞表格式的平台，作為後續標註的輔助資源，減少人工整理詞表與重複標註的時間。
+您可以在 Codex 中處理文本檔或單一網頁，也可以在 ChatGPT 使用短文本提示詞。完成的詞表可搭配 [Textoria Markup](https://github.com/cclintw/textoria-markup) 建立標註閱讀頁，或轉為 MARKUS、DocuSky 使用的標記詞表。
 
-輸出格式為 `name,type,alias` CSV，可用試算表檢視，也可依 MARKUS 等工具的匯入要求調整後使用。
+詳細專案介紹，請參閱 [文本標註的外部詞表建置：增量式實體提取方法](https://cclin.cc/textoria-incremental-entity-extraction/)。
 
-詳細專案介紹，請參閱 [Code Skill 實作 – 文本標註的外部詞表建置：增量式實體提取方法](https://cclin.cc/textoria-incremental-entity-extraction/)
+## 功能特色
 
-## 選擇使用方式
+- **多種實體類型**：涵蓋人物、地名、組織、官職、官銜、作品、年號、族群，以及動植物、物產、器物等類型。
+- **依原文整理名稱**：核對正名與別名，保留原文的歷史寫法與異體字，不憑名稱相似就合併人物或地點。
+- **便於檢視的詞表**：預設輸出名稱、類型、別名三欄 CSV，可用試算表檢查及修訂。
+- **平台格式轉換**：Codex 工作流程可加選 MARKUS TXT、DocuSky XLSX，也可轉換既有 Textoria CSV。
+- **兩種使用方式**：Codex 適合逐段處理全文並保存成果；ChatGPT 提示詞適合先從短文開始。
 
-**建議使用 Codex app**：安裝本專案的 Skill 後，上傳文本或提供網址，即可提取實體並將 CSV 儲存在專案中，工作資料只放系統暫存目錄，成功匯出後清除。
+## 安裝
 
-**使用 ChatGPT 時，改用下方提示詞**：複製貼上提示詞，再提供要提取的文本即可，建議先用短文。提取內容可能不如 Codex app 完整，請對照原文檢查。
+### 方法一：透過 Codex 安裝
 
-## 在 Codex app 安裝
-
-### 方法一：貼上安裝指令
-
-在 Codex app 開啟專案，貼上下方指令並送出：
+在 Codex app 開啟您的工作專案，將下方指令貼到對話中送出：
 
 ```text
 $skill-installer --repo cclintw/textoria-entity-extractor --path .agents/skills/textoria-entity-extractor --dest .agents/skills
 ```
 
+安裝完成後，在下一回合開始使用。
+
 ### 方法二：手動下載安裝
 
 1. 開啟 [GitHub 專案頁面](https://github.com/cclintw/textoria-entity-extractor)，選擇 **Code → Download ZIP**。
-2. 解壓縮，找到 `.agents/skills/textoria-entity-extractor/`；必要時開啟顯示隱藏檔案。
-3. 將這個完整的 Skill 資料夾複製到 `<專案>/.agents/skills/`，保留內部檔案。入口檔案應為 `<專案>/.agents/skills/textoria-entity-extractor/SKILL.md`。
+2. 解壓縮，找到 `.agents/skills/textoria-entity-extractor/` 資料夾；必要時開啟顯示隱藏檔案。
+3. 將整個 `textoria-entity-extractor` Skill 資料夾複製到工作專案的 `.agents/skills/` 中。完成後，入口檔案的位置應為 `<工作專案>/.agents/skills/textoria-entity-extractor/SKILL.md`。
 
-Skill 名稱為 `textoria-entity-extractor`。來源副本與 CSV 統一存放在 `<專案>/textoria-entity-extractor/`，第一次提取時才建立。GitHub repository 名稱仍為 `textoria-entity-extractor`。
+使用 ChatGPT 提示詞不需安裝 Skill，可直接依下方說明操作。
 
-## Codex app 使用方式
+## 操作說明
 
+### 1. 選擇使用方式
+
+| 方式 | 適合的需求 |
+|---|---|
+| Codex app（建議） | 從文本檔或單一網頁提取實體，將成果保存在工作專案，並選擇平台格式。 |
+| ChatGPT 提示詞 | 直接貼上提示詞與短文，先試用實體提取並取得 CSV。 |
+
+### 2. 在 Codex 提供文本
 
 <a href="assets/demo-rounde.webp"><img src="assets/demo-preview.webp" alt="Textoria 文本實體提取工具：實體清單 CSV 預覽" width="800"></a>
 
 [點此觀看操作動畫](assets/demo-rounde.webp)。
 
-開啟本機工作專案，上傳文本，然後說：
+在 Codex 專案中上傳文本，然後說：
 
 ```text
 請針對上傳的文本提取實體清單。
 ```
 
-也可以提供本機檔案路徑，或指定網頁：
+也可以提供本機檔案路徑，或指定單一網頁：
 
 ```text
 請從 https://example.org/article 提取實體清單。
 ```
 
-成果會自動儲存在工作專案的 `textoria-entity-extractor/csv/` 資料夾，欄位為 `name,type,alias`，不需要另行下載。若來源或存放位置不明確，Codex 會再詢問。
+未限定類型時，會依工具支援的類型檢視文本中的適用實體；您也可以依研究需要指定範圍。網頁需能取得完整正文；遇到登入限制或分頁內容時，Codex 會說明尚未取得的範圍。
 
-**Textoria CSV 每次都會產生。** 開始提取前，Codex 會詢問：「除了預設的 Textoria CSV，還需要輸出 MARKUS TXT、DocuSky XLSX 嗎？可複選，也可以只保留 CSV。」已指定格式時不會重問。全文只提取一次，選定的平台檔由完成的 CSV 透過 Python 標準函式庫轉換，不再呼叫 LLM 重新提取；日後也可直接要求轉換既有 Textoria CSV。
+### 3. 選擇格式並檢視成果
 
-- **MARKUS TXT**：UTF-8，第一列為以 Tab 分隔的 `tagtype`、`tag`、`id` 表頭；資料列固定三欄，ID 無內容時保留空欄。不加結尾空白列，貼入「批量標記／Batch Markup」時只複製第二列起的資料。優先對應 MARKUS 內建標籤，其餘為自訂標籤；ID 留空，不捏造權威編號。
-- **DocuSky XLSX**：供「文本批次標記／ContentTagging」工具讀取的 Excel，欄位為 `tagName,tagVal,@Term`。人名對應 `PersonName`、地名對應 `LocName`，其他類型對應 `Udef_<type>`。`@Term` 留空，已確認的兩字以上別名作為平台比對詞。
+每次提取都會產生 Textoria CSV。開始前，Codex 會詢問是否另加 MARKUS TXT、DocuSky XLSX，或兩種都加；也可以只保留 CSV。已指定格式時不會重問。
 
-附加檔與 CSV 存在同一資料夾，檔名為 `markus-<CSV原檔名去副檔名>.txt`、`docusky-<CSV原檔名去副檔名>.xlsx`。CSV 仍是可供檢查修改的主檔。平台檔是標記用詞表，匯入後仍須檢視標記結果。詳見 [轉檔規則與指令](.agents/skills/textoria-entity-extractor/references/platform-exports.md)。
+例如：
 
-## ChatGPT 使用方式
+```text
+請提取全文實體清單，保留 CSV，另加 MARKUS TXT 和 DocuSky XLSX。
+```
+
+完成後，點選成果連結，以試算表核對名稱、類型與別名。平台檔由完成的 CSV 轉換，無須重新提取全文。日後也可以上傳既有 Textoria CSV，直接要求轉檔。
+
+### 4. 在 ChatGPT 使用短文本提示詞
 
 1. 展開下方區塊，複製完整提示詞並貼到 ChatGPT。
-2. 上傳要提取的文本，按 Enter 送出。
-3. 完成後，下載 ChatGPT 提供的 CSV 檔案。
+2. 上傳或貼上要處理的短文本，送出提取要求。
+3. 完成後，檢視並保存 CSV；提供檔案連結需該對話支援檔案建立。
 
-CSV 下載需對話支援檔案建立。
-
-### 一鍵複製 ChatGPT 短文本提示詞
-
-展開下方區塊，點選程式碼區塊右上角的複製按鈕，貼到 ChatGPT 後上傳要提取的文本即可。提示詞內容與 [prompt.md](prompt.md) 完全相同。
+建議先從短文開始，並對照原文核對結果。下方提示詞與 [prompt.md](prompt.md) 相同。
 
 <details>
-<summary>ChatGPT 短文本提示詞：點此展開，複製後直接貼上 ChatGPT</summary>
+<summary>ChatGPT 短文本提示詞：點此展開，複製後貼到 ChatGPT</summary>
 
 <!-- BEGIN PROMPT.MD: keep this block identical to prompt.md -->
 ````text
@@ -133,85 +144,63 @@ name,type,alias
 - 建立 UTF-8 BOM 的 CSV，正確處理引號、逗號與空欄，依 type、name 排序，以來源名稱命名，不覆蓋既有檔案。
 - 不新增正式 JSON、HTML、TEI、逐處標註或資料庫匯出。舊 CSV 不靜默改寫；需根據證據重新整理並另存新檔，不自動重新提取。正名及兩字以上別名仍可能誤匹配普通詞，詞表不保證所有語境正確。
 - 完成時只簡短提供實際 CSV 下載連結。若無法建立檔案，說明並提供可另存的 CSV 文字，不捏造連結；未完成時須說明範圍，不宣稱百分之百無遺漏。
-
 ````
 <!-- END PROMPT.MD -->
 
 </details>
 
-## CSV 格式與提取原則
+## 成果格式
+
+| 成果 | 用途 |
+|---|---|
+| Textoria CSV | 預設詞表，欄位為 `name,type,alias`（名稱、類型、別名），供檢查、修訂及後續標註。也可要求省略別名欄。 |
+| MARKUS TXT | 供 MARKUS「批量標記／Batch Markup」使用的詞表。貼入時只複製第二列起的資料，不含表頭。 |
+| DocuSky XLSX | 供 DocuSky「文本批次標記／ContentTagging」工具讀取的實體詞表。 |
+
+MARKUS TXT 與 DocuSky XLSX 是 Codex 工作流程的可選成果。它們提供標記詞彙，不包含已標註全文；DocuSky XLSX 也不同於 Textoria Markup 匯出的詮釋資料表。需要閱讀、修訂與匯出標註文本時，可搭配 Textoria Markup 使用。
+
+CSV 格式示例：
 
 ```csv
 name,type,alias
 鄭經,person,
 吳三桂,person,三桂
 漳州,place,
-泉州,place,
-福州,place,榕城
 ```
 
-上例只示意格式，不是程式預設字典。
+`name` 是名稱，`type` 是英文類型，`alias` 是有原文證據支持的別名；多個別名以 `|` 分隔，沒有則留空。此表只示意格式，不會自動加入您的成果。
 
-- **只交付名稱清單：** 預設三欄 `name,type,alias`，也可要求兩欄 `name,type`。不增加 TEI 元素、日期、證據、編號或筆數欄。CSV 使用 UTF-8 BOM。
-- **依證據正名：** 已確認同一實體的表記整理為一列，name 為正名，兩字以上別名放 alias，不另建列。有獨立意義的巢狀實體仍保留；不因包含、相似或共用簡稱合併。
-- **別名與單字：** 多個別名用 `|` 分隔，不確定就留空。person、place（含行政區）、office、official_title 的 name 與 alias 一律至少兩字。其他類型排除單字簡稱，牛、馬等完整單字名稱經確認可作 name。「榕城→福州」須有證據，不無條件套用。
-- **標題與作品分開：** 本文標題、篇名、卷名不直接當 title，但其中其他實體仍要提取；正文引用的作品名稱可列為 title。
-- **年號與日期分開：** 「光緒二十年三月五日」收 `光緒,era_name`，不列舉完整日期。日期、時間、度量及金額預設不收；貨幣名稱可收。
-- **保留原文：** 不擅改歷史地名、異體或拼寫。此工具依來源證據整理正名與身分，下游仍須檢查標註語境及日期。
+## 成果保存與使用注意
 
-支援 type：
+Codex 成果存放在工作專案的 `textoria-entity-extractor/csv/`，來源副本保存在 `textoria-entity-extractor/source/`。同一來源保留最近三份 CSV；可選的平台 TXT／XLSX 另行保留，不會自動刪除。
 
-`person`, `place`, `organization`, `title`, `animal`, `plant`, `artifact`, `object`, `material`, `food`, `currency`, `clothing`, `textile`, `product`, `medicine`, `disease`, `symptom`, `office`, `official_title`, `contract_term`, `ethnic_group`, `era_name`。
+- **依語境核對**：提取可能有漏項或誤判。同名異人、名稱歧義與普通詞誤匹配，仍須對照原文檢查。
+- **名稱與別名**：只合併有證據支持的同一實體；人名、地名、官職及官銜的名稱與別名至少兩字，其他類型也排除單字簡稱。牛、馬等本身完整的單字名稱可在核對後保留。
+- **日期與標題**：收錄具名年號，不列完整日期、時間、數量或金額；貨幣名稱可收。文本自身標題不直接當作作品名稱，但正文引用的作品可以收錄。
+- **中斷與版本**：處理中的暫存資料會在 CSV 成功匯出後清除；中斷後能否續作，取決於暫存是否仍存在。請另行備份要長期保存的舊版 CSV。
 
-## 處理流程
+完整提取原則與格式細節，請參閱 [提取規則](.agents/skills/textoria-entity-extractor/references/extraction-workflow.md)及[平台轉檔說明](.agents/skills/textoria-entity-extractor/references/platform-exports.md)。
 
-Codex 逐段閱讀文本、累積實體清單，再核對原文，以 `resolve` 明確審核正名及身分後匯出 CSV。同名異人可保留同名同類的不同列，三欄格式無法完整表達身分差異。處理期間使用系統暫存目錄，成功匯出後清除；中斷後僅在暫存仍存在時可續跑。
+## 版本與更新
 
-舊 CSV 不靜默改寫，需要根據證據重新整理並另存新檔，不自動重提文本。轉檔前會拒絕單字 alias 及未確認的單字 name；person、place（含行政區）、office、official_title 的單字名稱一律拒絕；僅其他類型確認為完整名稱時可使用 `--full-single-names 牛 馬`，不能藉此允許單字人名、地名、行政區名或官職名。已確認的兩字以上 alias 可作平台比對詞，不會成為正式 CSV 的另一列。平台詞表無法區分同名異人，正名與別名也仍可能誤匹配普通詞，不保證所有語境正確。不新增 HTML、TEI、逐處標註、資料庫匯出或正式 JSON 成果。
-
-## 成果檔案
-
-CSV 儲存在專案的 `textoria-entity-extractor/csv/` 資料夾，以來源名稱、來源識別碼與匯出時間命名。同一來源保留最近三份 CSV。附加的平台 TXT／XLSX 獨立保留，不會自動刪除。
-
-## 專案檔案
-
-| 檔案 | 用途 |
-|---|---|
-| [.agents/skills/textoria-entity-extractor/SKILL.md](.agents/skills/textoria-entity-extractor/SKILL.md) | Codex 工作流程與提取規則 |
-| [.agents/skills/textoria-entity-extractor/scripts/](.agents/skills/textoria-entity-extractor/scripts/) | Skill 使用的輔助程式 |
-| [prompt.md](prompt.md) | ChatGPT 短文本提示詞 |
-| [README.md](README.md) | 英文說明 |
-| [CITATION.cff](CITATION.cff) | 軟體引用資料 |
-| [LICENSE](LICENSE) | GPL v3 或後續版本授權條款 |
+更新資訊請參閱 [GitHub 專案頁面](https://github.com/cclintw/textoria-entity-extractor)。引用成果或記錄研究方法時，建議一併記下使用的版本或 Git 提交編號，以便日後核對。
 
 ## 作者與引用
 
-作者與開發者：**Chance Chun-Cheng Lin**（GitHub：[cclintw](https://github.com/cclintw)）。引用本專案時，可使用以下格式：
+作者與開發者：**Chance Chun-Cheng Lin**（GitHub：[cclintw](https://github.com/cclintw)）。引用本專案時，可使用以下格式，並補上使用版本：
 
 ```text
 Chance Chun-Cheng Lin. Textoria Entity Extractor: A Codex Skill and ChatGPT Prompt for Named Entity Extraction. 2026–. https://github.com/cclintw/textoria-entity-extractor.
 ```
 
-中文格式：
-
-```text
-Chance Chun-Cheng Lin。Textoria 文本實體提取工具：用於命名實體提取的 Codex Skill 與 ChatGPT 提示詞。2026–。https://github.com/cclintw/textoria-entity-extractor。
-```
-
-也可使用 [CITATION.cff](CITATION.cff) 中的引用資料。
-
-## 參考資料
-
-- [OpenAI 官方文件：Build skills](https://learn.chatgpt.com/docs/build-skills)
-- [OpenAI 官方文件：Work with files](https://learn.chatgpt.com/docs/artifacts-viewer)
-- [TEI Guidelines：title](https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-title.html)
-
-本專案為獨立專案，非 OpenAI 官方產品。來源文本與第三方素材的權利仍屬各自權利人。
+軟體引用資料見 [CITATION.cff](CITATION.cff)。
 
 ## 授權
 
-本專案採用 [GNU GPL 第 3 版或任何後續版本](LICENSE)（`GPL-3.0-or-later`），Copyright © 2026 Chance Chun-Cheng Lin。允許使用、修改、散布及商業販售。散布原版或修改版時，須保留必要的著作權、授權與免責聲明，標示修改，並依所選 GPL 版本規定以該授權提供對應原始碼。
+本專案採用 [GNU GPL 第 3 版或任何後續版本](LICENSE)（`GPL-3.0-or-later`），Copyright © 2026 Chance Chun-Cheng Lin。散布時須遵守授權條款，保留必要聲明並依規定提供對應原始碼。
+
+本專案為獨立專案，非 OpenAI 官方產品。來源文本與第三方素材的權利仍屬各自權利人。
 
 ## 支持專案
 
-如果本專案對您有幫助，歡迎給一顆 **GitHub 星星 ⭐** 支持！也歡迎回報漏提案例、可重現的問題或提出規則改進建議。分享案例到 issue 前，請先確認來源素材的使用權限。
+如果本專案對您的工作有幫助，歡迎給一顆 **GitHub 星星 ⭐**，或透過 Issue 回報漏提案例、問題與改進建議。分享文本案例前，請先確認素材的使用權限。

@@ -2,80 +2,88 @@
 
 [繁體中文](readme_zh-TW.md) · [ChatGPT short-text prompt](prompt.md) · [Codex Skill](.agents/skills/textoria-entity-extractor/SKILL.md) · [GNU GPL v3 or later](LICENSE)
 
-One of the essential resources for text annotation is a reference vocabulary. Although APIs and MCP can provide access to external authority lists, suitable resources are not available for every type of text. Researchers often still need to build a reference vocabulary tailored to their source material. Compiling such a vocabulary manually, however, is tedious and one of the most time-consuming parts of text annotation.
+Textoria Entity Extractor helps you build an entity reference vocabulary from a text, reducing the time spent compiling names manually. It identifies entities in the source, checks canonical names and aliases, and produces a CSV you can review and edit in a spreadsheet for later annotation.
 
-This Codex Skill addresses that problem through incremental entity extraction. The basic idea is simple: first extract named entities from the full text to build an entity list, then use that list as a reference vocabulary for subsequent annotation. Before working with text annotation platforms such as MARKUS or DocuSky, users can use this Skill to automatically extract people, places, official positions, organizations, and other entities into a CSV reference vocabulary. The vocabulary can then be imported into platforms that support the corresponding format, reducing the time spent manually compiling vocabularies and repeatedly annotating the same names.
+Use Codex to process text files or a single web page, or use the short-text prompt in ChatGPT. The vocabulary can be used with [Textoria Markup](https://github.com/cclintw/textoria-markup) to create an annotated reader, or converted into vocabulary inputs for MARKUS and DocuSky.
 
+For a detailed project overview, see [Building reference vocabularies for text annotation through incremental entity extraction](https://cclin.cc/textoria-incremental-entity-extraction/).
 
-Results use the `name,type,alias` CSV format for review in a spreadsheet or adaptation for tools such as MARKUS.
+## Features
 
-For a detailed project overview, please refer to: [textoria-incremental-entity-extraction/](https://cclin.cc/textoria-incremental-entity-extraction/)
+- **Multiple entity types:** Covers people, places, organizations, offices, official titles, works, named eras, ethnic groups, and types such as animals, plants, products, and artifacts.
+- **Names checked against the source:** Reviews canonical names and aliases while preserving historical spellings and character variants. Similar names alone do not establish that people or places are the same entity.
+- **Vocabularies for review:** Exports a CSV with name, type, and alias columns by default, ready to check and revise in a spreadsheet.
+- **Platform conversion:** The Codex workflow offers optional MARKUS TXT and DocuSky XLSX outputs and can convert an existing Textoria CSV.
+- **Two ways to use it:** Codex supports reading a full text section by section and saving results; the ChatGPT prompt is suitable for starting with short passages.
 
-## Choose your workflow
+## Installation
 
-**Use the Codex app for the recommended workflow.** Install this project's Skill, then upload your text or provide a URL. Results are saved as a CSV in your project. Processing uses system temporary storage, which is cleared after a successful export.
+### Option 1: Install through Codex
 
-**In ChatGPT, use the prompt below instead.** Paste the prompt, then provide your source text; start with a short passage. Extraction may be less complete than in the Codex app, so check the result against the source.
-
-
-## Install in the Codex app
-
-### Option 1: Paste the installation command
-
-Open your project in the Codex app, paste the following command into the chat, and send it:
+Open your working project in the Codex app, paste the following command into the chat, and send it:
 
 ```text
 $skill-installer --repo cclintw/textoria-entity-extractor --path .agents/skills/textoria-entity-extractor --dest .agents/skills
 ```
 
+After installation, you can start using the Skill on your next turn.
 
 ### Option 2: Download and install manually
 
-1. Open [the repository](https://github.com/cclintw/textoria-entity-extractor) and choose **Code → Download ZIP**.
-2. Extract it and locate `.agents/skills/textoria-entity-extractor/` (enable hidden files if needed).
-3. Copy that entire Skill folder into `<your-project>/.agents/skills/`, preserving its contents. The resulting entrypoint is `<your-project>/.agents/skills/textoria-entity-extractor/SKILL.md`.
+1. Open [the GitHub repository](https://github.com/cclintw/textoria-entity-extractor) and choose **Code → Download ZIP**.
+2. Extract it and locate the `.agents/skills/textoria-entity-extractor/` folder. Enable hidden files if needed.
+3. Copy the entire `textoria-entity-extractor` Skill folder into your working project's `.agents/skills/` folder. The resulting entrypoint should be `<your-project>/.agents/skills/textoria-entity-extractor/SKILL.md`.
 
-The Skill is named `textoria-entity-extractor`. Source copies and CSVs are stored under `<your-project>/textoria-entity-extractor/`, created on first extraction. The repository name remains `textoria-entity-extractor`.
+The ChatGPT prompt does not require Skill installation. Follow the instructions below to use it directly.
 
-## Use in the Codex app
+## How to use
 
+### 1. Choose your workflow
+
+| Workflow | Suitable uses |
+|---|---|
+| Codex app (recommended) | Extract entities from a text file or a single web page, save results in your project, and choose platform formats. |
+| ChatGPT prompt | Paste the prompt and a short passage to try entity extraction and obtain a CSV. |
+
+### 2. Provide your text in Codex
 
 <a href="assets/demo-rounde.webp"><img src="assets/demo-preview.webp" alt="Textoria Entity Extractor: extracted entities in a CSV preview" width="800"></a>
 
 [Watch the animated demo](assets/demo-rounde.webp).
 
-Open a local project, upload a text file, and say:
+Upload a text file in your Codex project and say:
 
 ```text
-Extract an entity list from the uploaded text.
+Please extract an entity list from the uploaded text.
 ```
 
-You can also provide a local file path or a web page URL:
+You can also provide a local file path or specify a single web page:
 
 ```text
-Extract an entity list from https://example.org/article
+Please extract an entity list from https://example.org/article
 ```
 
-The CSV is automatically saved in the project's `textoria-entity-extractor/csv/` folder with `name,type,alias` columns. No separate download is needed. If the source or save location is unclear, Codex asks you to clarify.
+Unless you restrict the types, extraction considers applicable entities across the tool's supported types. You can also define a narrower scope for your research. The complete web page text must be accessible; if login restrictions or pagination prevent access, Codex will explain which parts it has not obtained.
 
-Textoria CSV is always included. Before extraction, Codex asks whether you also want **MARKUS TXT**, **DocuSky XLSX**, both, or CSV only, unless you have already specified your preference. Extraction runs once; the selected platform files are converted from the completed CSV with Python's standard library, without another LLM extraction pass. You can also ask to convert an existing Textoria CSV later.
+### 3. Choose formats and review the results
 
-- **MARKUS TXT:** UTF-8 with a Tab-separated `tagtype`, `tag`, `id` header and three columns on every data row, including an empty ID field. Paste the data rows (excluding the header) into **Batch Markup**. No trailing blank line is added. Uses built-in MARKUS tags where available and custom tags otherwise; IDs are blank to avoid inventing authority identifiers.
-- **DocuSky XLSX:** an Excel workbook for **ContentTagging / BatchTagging**, with `tagName,tagVal,@Term` columns. People map to `PersonName`, places to `LocName`, and other types to `Udef_<type>`. `@Term` stays blank; confirmed multi-character aliases become platform matching terms.
+Every extraction includes a Textoria CSV. Before starting, Codex asks whether you also want MARKUS TXT, DocuSky XLSX, both, or CSV only. It will not ask again if you have already specified your preference.
 
-Additional files are saved beside the CSV as `markus-<CSV-stem>.txt` and `docusky-<CSV-stem>.xlsx`. The CSV remains the editable master. These are vocabulary inputs, not already annotated texts; review the resulting platform annotations. See [conversion rules and commands](.agents/skills/textoria-entity-extractor/references/platform-exports.md).
+For example:
 
-## Use in ChatGPT
+```text
+Please extract entities from the full text and provide the CSV, MARKUS TXT, and DocuSky XLSX.
+```
+
+When finished, open the result links and check names, types, and aliases in a spreadsheet. Platform files are converted from the completed CSV without extracting the text again. You can also upload an existing Textoria CSV later and ask for conversion directly.
+
+### 4. Use the short-text prompt in ChatGPT
 
 1. Expand the section below, copy the complete prompt, and paste it into ChatGPT.
-2. Upload the text you want to extract from and press Enter.
-3. When finished, download the CSV provided by ChatGPT.
+2. Upload or paste a short source text and submit your extraction request.
+3. Review and save the CSV when finished. File links require file-creation tools to be available in that chat.
 
-CSV downloads require file-creation tools in the chat.
-
-### Copy the ChatGPT short-text prompt
-
-Expand the section below and use the code block's copy button. Paste the prompt into ChatGPT, then upload your source text. The prompt matches [prompt.md](prompt.md).
+Start with a short passage and check the results against the source. The prompt below matches [prompt.md](prompt.md).
 
 <details>
 <summary>ChatGPT short-text prompt — expand, copy, and paste into ChatGPT</summary>
@@ -136,79 +144,63 @@ name,type,alias
 - 建立 UTF-8 BOM 的 CSV，正確處理引號、逗號與空欄，依 type、name 排序，以來源名稱命名，不覆蓋既有檔案。
 - 不新增正式 JSON、HTML、TEI、逐處標註或資料庫匯出。舊 CSV 不靜默改寫；需根據證據重新整理並另存新檔，不自動重新提取。正名及兩字以上別名仍可能誤匹配普通詞，詞表不保證所有語境正確。
 - 完成時只簡短提供實際 CSV 下載連結。若無法建立檔案，說明並提供可另存的 CSV 文字，不捏造連結；未完成時須說明範圍，不宣稱百分之百無遺漏。
-
 ````
 <!-- END PROMPT.MD -->
 
 </details>
 
-## CSV format and extraction rules
+## Output formats
+
+| Output | Purpose |
+|---|---|
+| Textoria CSV | The default vocabulary, with `name,type,alias` columns, for review, revision, and subsequent annotation. You can also request that the alias column be omitted. |
+| MARKUS TXT | A vocabulary for MARKUS **Batch Markup**. Paste only the data rows, starting from the second line, without the header. |
+| DocuSky XLSX | An entity vocabulary for DocuSky's **ContentTagging / BatchTagging** tool. |
+
+MARKUS TXT and DocuSky XLSX are optional outputs of the Codex workflow. They supply matching terms rather than annotated full texts. The DocuSky XLSX also differs from the metadata tables exported by Textoria Markup. Use Textoria Markup when you need to read, revise, and export annotated texts.
+
+Example CSV:
 
 ```csv
 name,type,alias
 鄭經,person,
 吳三桂,person,三桂
 漳州,place,
-泉州,place,
-福州,place,榕城
 ```
 
-This is an illustrative example, not a built-in entity dictionary.
+`name` is the entity name, `type` is its English type, and `alias` contains aliases supported by source evidence. Separate multiple aliases with `|`, or leave the field blank if none are confirmed. This example illustrates the format; its entries are not automatically added to your results.
 
-- **Only name data:** The default columns are `name,type,alias`. Request `name,type` if you do not want alias information. No TEI element, date, evidence, ID, or count columns are added. CSV files use UTF-8 with BOM.
-- **Canonical reference rows:** Evidence-backed forms of one entity are consolidated under its canonical name; confirmed aliases stay in `alias`, without separate CSV rows. Independent nested entities remain separate. Homonyms and ambiguous names are not merged by spelling, containment, or shared aliases.
-- **Confirmed aliases:** Use `|` between aliases of at least two characters; unknown relations stay blank. For person/place/office/official_title (administrative divisions use place), name and alias must always have at least two characters, including complete names. Other types exclude single-character abbreviations; complete one-character names such as 牛 and 馬 may remain after review. The 榕城/福州 relation in the example requires evidence.
-- **Titles:** The document's own headings and volume labels are not automatically `title` entities. Other entities inside headings are still extracted. Names of works referenced in the text can be `title`.
-- **Named eras:** `光緒二十年三月五日` contributes `光緒,era_name`, not a precomputed date entry. Complete dates, times, measurements, and monetary amounts are excluded; currency names can be included.
-- **Original forms:** Historical names and spelling variants are preserved. The workflow extracts a reference inventory; identity review uses source evidence; downstream annotation and calendar conversion remain outside its scope.
+## Saved results and usage notes
 
-Supported types:
+Codex saves results under `textoria-entity-extractor/csv/` in your working project and source copies under `textoria-entity-extractor/source/`. The three most recent CSVs are kept for each source. Optional platform TXT/XLSX files are retained separately and are not automatically deleted.
 
-`person`, `place`, `organization`, `title`, `animal`, `plant`, `artifact`, `object`, `material`, `food`, `currency`, `clothing`, `textile`, `product`, `medicine`, `disease`, `symptom`, `office`, `official_title`, `contract_term`, `ethnic_group`, `era_name`.
+- **Check the context:** Extraction may miss entities or misidentify them. Homonyms, ambiguous names, and ordinary words matched as names still need to be checked against the source.
+- **Names and aliases:** Only forms supported as the same entity are consolidated. Person, place, office, and official-title names and aliases must have at least two characters; other types also exclude single-character abbreviations. Complete one-character names such as 牛 and 馬 may be retained after review.
+- **Dates and headings:** Named eras are included, while complete dates, times, quantities, and monetary amounts are excluded. Currency names may be included. A text's own headings are not automatically treated as work titles, but works referenced in the body can be included.
+- **Interruptions and versions:** Temporary processing data is cleared after successful CSV export. Whether an interrupted run can resume depends on whether its temporary data still exists. Back up older CSVs you want to keep long term.
 
-## How processing works
+For the full extraction principles and format details, see [extraction rules](.agents/skills/textoria-entity-extractor/references/extraction-workflow.md) and [platform conversion guidance](.agents/skills/textoria-entity-extractor/references/platform-exports.md).
 
-Codex reads the text section by section, builds an entity list, checks it against the source, explicitly reviews canonical names and identities with `resolve`, and exports a CSV. Same-name identities may retain separate rows; the fixed columns cannot fully express their distinction. Work is kept in system temporary storage during processing and removed after a successful export. Interrupted runs can resume while their temporary work still exists.
+## Versions and updates
 
-Legacy CSVs are never silently rewritten. They require evidence-based review and a separately saved file; conversion cannot infer identities from CSV strings. Platform converters reject single-character aliases and unconfirmed single-character names before writing files. Pass `--full-single-names 牛 馬` only for reviewed complete names of other types; it never permits a single-character person, place, administrative-division, office or official-title name. Confirmed multi-character aliases may become platform matching terms, but are never additional rows in the formal CSV. Platform vocabularies cannot distinguish homonyms, and canonical names or aliases may still match ordinary words incorrectly. No HTML, TEI, occurrence annotation, database export, or formal JSON output is added.
-
-## Output files
-
-CSVs are saved in the project's `textoria-entity-extractor/csv/` folder and named after the source, its identifier, and export time. The three most recent CSVs are kept for each source. Optional platform TXT/XLSX files are retained separately and are not automatically deleted.
-
-## Repository contents
-
-| File | Purpose |
-|---|---|
-| [.agents/skills/textoria-entity-extractor/SKILL.md](.agents/skills/textoria-entity-extractor/SKILL.md) | Codex workflow and extraction rules |
-| [.agents/skills/textoria-entity-extractor/scripts/](.agents/skills/textoria-entity-extractor/scripts/) | Supporting programs used by the Skill |
-| [prompt.md](prompt.md) | ChatGPT short-text prompt |
-| [readme_zh-TW.md](readme_zh-TW.md) | Traditional Chinese documentation |
-| [CITATION.cff](CITATION.cff) | Software citation metadata |
-| [LICENSE](LICENSE) | GNU GPL v3 or later |
+See [the GitHub repository](https://github.com/cclintw/textoria-entity-extractor) for updates. When citing results or documenting research methods, record the version or Git commit used so you can check it later.
 
 ## Author and citation
 
-Author and developer: **Chance Chun-Cheng Lin** (GitHub: [cclintw](https://github.com/cclintw)). To cite this project, use:
+Author and developer: **Chance Chun-Cheng Lin** (GitHub: [cclintw](https://github.com/cclintw)). To cite this project, use the following format and add the version you used:
 
 ```text
 Chance Chun-Cheng Lin. Textoria Entity Extractor: A Codex Skill and ChatGPT Prompt for Named Entity Extraction. 2026–. https://github.com/cclintw/textoria-entity-extractor.
 ```
 
-Citation metadata is also available in [CITATION.cff](CITATION.cff).
-
-## References
-
-- [Official OpenAI documentation: Build skills](https://learn.chatgpt.com/docs/build-skills)
-- [Official OpenAI documentation: Work with files](https://learn.chatgpt.com/docs/artifacts-viewer)
-- [TEI Guidelines: title](https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-title.html)
-
-This is an independent project, not an official OpenAI product. Source texts and third-party materials retain their own rights.
+Software citation metadata is available in [CITATION.cff](CITATION.cff).
 
 ## License
 
-Released under the [GNU General Public License, version 3 or any later version](LICENSE) (`GPL-3.0-or-later`), Copyright © 2026 Chance Chun-Cheng Lin. You may use, modify, and redistribute the project, including commercially. When distributing original or modified versions, preserve the required copyright, license, and warranty notices, mark modifications, and provide corresponding source code under the applicable GPL version as required by the license.
+This project is released under the [GNU General Public License, version 3 or any later version](LICENSE) (`GPL-3.0-or-later`), Copyright © 2026 Chance Chun-Cheng Lin. Redistribution must comply with the license, preserve required notices, and provide corresponding source code as required.
+
+This is an independent project, not an official OpenAI product. Source texts and third-party materials retain their respective rights.
 
 ## Support the project
 
-If this project helps your work, please give it a **GitHub star ⭐**. Reports of missed names, reproducible issues, and improvements to the extraction rules are welcome. Please check the rights to any source material before sharing an example in an issue.
+If this project helps your work, please give it a **GitHub star ⭐**, report missed entities or issues, or suggest an improvement. Before sharing text examples, please check that you have permission to share the material.
